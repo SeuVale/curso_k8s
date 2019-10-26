@@ -1,0 +1,107 @@
+Slide 05
+
+Labels
+
+Os rótulos permitem que os usuários mapeiem suas próprias estruturas organizacionais para objetos do sistema de maneira flexível, sem exigir que os clientes armazenem esses mapeamentos.
+
+Exemplo de rótulos:
+
+"release" : "stable", "release" : "canary"
+"environment" : "dev", "environment" : "qa", "environment" : "production"
+"tier" : "frontend", "tier" : "backend", "tier" : "cache"
+"partition" : "customerA", "partition" : "customerB"
+"track" : "daily", "track" : "weekly"
+
+Slide 06
+
+kubectl get nodes
+
+kubectl label node kube-node01.dexter.com.br cloud=AWS
+kubectl label node kube-node02.dexter.com.br cloud=AZURE
+
+kubectl get node kube-node01.dexter.com.br --show-labels
+kubectl get node kube-node02.dexter.com.br --show-labels
+
+Descrição dos comandos
+
+kubectl label node: Atualiza os labels em um recurso. No exemplo apresentado, estamos adicionando um novo label em um Node;
+--show-labels: Exibe todos os rótulos como a última coluna.
+
+Para remover um label, utilize o comando kubectl label node <nome_do_nome> label-. 
+Exemplo:
+$ kubectl label node kube-node01.dexter.com.br cloud-
+$ kubectl label node kube-node02.dexter.com.br cloud-
+
+Slide 07
+
+cat aula04/labels/nginx-deploy.yaml 
+kubectl create -f aula04/labels/nginx-deploy.yaml
+
+kubectl get pods -o wide | grep nginx-deploy
+
+kubectl edit deploy nginx-deploy1
+nodeSelector:
+        cloud: AWS
+
+
+Slide 08
+
+kubectl get pods -o wide | grep nginx-deploy
+
+kubectl edit deploy nginx-deploy2
+      nodeSelector:
+        cloud: AZURE
+
+kubectl get pods -o wide
+kubectl delete -f aula04/labels/nginx-deploy.yaml
+
+
+
+
+
+nodeSelector
+
+O nodeSelector é a forma mais simples recomendada de restrição de seleção de nós. O nodeSelector é um campo do PodSpec. Ele especifica um mapa de pares de valores-chave. Para que o pod seja elegível para ser executado em um nó, o nó deve ter cada um dos pares de valor-chave indicados como rótulos.
+
+
+Slide 10
+
+Requisitos
+
+Os requisitos baseados em igualdade ou desigualdade, permitem a filtragem por chaves e valores de rótulo. Os objetos correspondentes devem satisfazer todas as restrições de rótulo especificadas, embora possam ter rótulos adicionais também. Três tipos de operadores são admitidos =, ==,! =. Os dois primeiros representam a igualdade (e são simplesmente sinônimos), enquanto o segundo representa a desigualdade. Por exemplo:
+
+environment = production
+tier != frontend
+
+Slide 11
+
+cat aula04/labels/nginx-replication.yaml 
+kubectl create -f aula04/labels/nginx-replication.yaml
+
+kubectl get pod -o wide | grep nginx-deploy
+
+kubectl edit deploy nginx-deploy
+
+Descrição dos comandos
+
+affinity: Define uma regra de afinidade de um Pod;
+nodeAffinity: Define as regras de afinidade de seleção do Node;
+preferredDuringSchedulingIgnoredDuringExecution: Define qual será a regra necessária durante o agendamento do Pod;
+weight: Especifique um peso para o Nó, o valor pode ir de 1 até 100. O Nó com maior peso é o preferido;
+matchExpressions: Permite restringir o agendamento do Pod, atendendo à chaves e valores;
+key: Define a chave do Label. Exemplo: cloud;
+operator: Os operadores legais para afinidade e antiafinidade são In, NotIn, Exists, DoesNotExist;
+values: Define o valor presente (In) na chave. Exemplo: AWS.
+
+          - AWS
+            Weight: 10
+
+                - AZURE
+            weight: 90
+
+kubectl get pod -o wide | grep nginx-deploy
+
+kubectl delete -f aula04/labels/nginx-replication.yaml 
+
+
+

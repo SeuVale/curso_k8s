@@ -1,0 +1,102 @@
+Slide 05
+
+Ingress Service
+
+O Ingress fica na frente de vários serviços e atua como um "roteador inteligente" ou ponto de entrada em seu cluster. Por exemplo, você pode enviar tudo em nginx.dexter.com.br para um serviço chamado nginx-service.
+
+Slide 06
+
+Acessando uma aplicação via Ingress
+
+O Ingress é o mais útil se você quiser expor vários serviços sob o mesmo endereço IP, e todos esses serviços usam o mesmo protocolo L7 (geralmente HTTP).
+
+Em nosso curso, estamos usando o HAProxy para redirecionar o acesso da porta 80 para 31080 e da porta 443 para 31443. 
+
+Etapas de acesso externo, usando HAProxy e Ingress:
+
+O cliente acessa um domínio, como por exemplo nginx.dexter.com.br;
+O HAProxy verifica que a porta é 80 e redireciona para a porta 31080, em todos os Nodes do Cluster Kubernetes;
+A requisição cai no Ingress, porque o seu serviço NodePort está configurado na porta 31080;
+O ingress envia a requisição ao serviço Kubernetes, atrelado ao domínio nginx.dexter.com.br;
+Como resultado, o cliente acessa o conteúdo do Pod que está atrelado ao serviço configurado no Ingress.
+
+
+Slide 07
+
+cat aula03/ingress/http/deploy-nginx.yaml 
+kubectl create -f aula03/ingress/http/deploy-nginx.yaml 
+
+cat aula03/ingress/http/ingress-nginx.yaml 
+kubectl create -f aula03/ingress/http/ingress-nginx.yaml
+
+Descrição das opções
+
+host: Define o domínio que será acessado via Ingress;
+http: Define as configurações de acesso na porta 80;
+paths: Define a área que será acessada no domínio. O padrão é a raiz;
+backend: Define as configurações de acesso ao backend;
+serviceName: Define o nome do serviço que está atrelado ao Pod, onde o site está em execução;
+servicePort: Define o número da porta do serviço.
+
+Convertendo manifesto YAML para linha de comando
+
+deploy-nginx.yaml: 
+kubectl create deployment nginx-deploy --image=nginx
+kubectl scale deployment/nginx-frploy --replicas=1
+kubectl expose deployment nginx-deploy --port 80 --target-port 80 --selector='app=nginx' --name=nginx-service
+
+Slide 08
+
+kubectl get ingress
+kubectl describe ingress dexter-ingress
+
+curl nginx.dexter.com.br
+curl -kivL -H 'Host: nginx.dexter.com.br' 'http://200.100.50.200'
+CTL + C
+
+kubectl delete -f aula03/ingress/http
+
+
+Slide 10
+
+Acessando uma aplicação via Ingress
+
+A diferença entre o Ingress da porta 80 para o de Rewite, está na linha que define um URI de destino em que o tráfego deve ser redirecionado:
+
+
+cat aula03/ingress/rewrite/deploy-nginx.yaml 
+kubectl create -f aula03/ingress/rewrite/deploy-nginx.yaml
+
+cat aula03/ingress/web-nginx.sh
+bash aula03/ingress/web-nginx.sh
+
+cat aula03/ingress/rewrite/ingress-rewrite.yaml
+kubectl create -f aula03/ingress/rewrite/ingress-rewrite.yaml
+
+kubectl get ingress
+kubectl describe ingress ingress-rewrite
+
+curl nginx.dexter.com.br/matriz
+curl nginx.dexter.com.br/filial
+
+kubectl delete -f aula03/ingress/rewrite
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,43 @@
+Slide 05
+
+Controlando o acesso à API do Kubernetes
+
+Os usuários acessam a API usando kubectl, bibliotecas de clientes ou fazendo solicitações REST. Usuários humanos e contas de serviço do Kubernetes, podem ser autorizados para acesso à API. Quando uma solicitação chega à API, ela passa por vários estágios, ilustrados no diagrama acima.
+
+
+Slide 06
+
+Autenticação
+
+A entrada para a etapa de autenticação é toda a solicitação HTTP, no entanto, normalmente apenas examina os cabeçalhos e/ou o certificado do cliente;
+Os módulos de autenticação incluem certificados de cliente, senha e tokens simples, tokens de bootstrap e tokens JWT (usados para contas de serviço);
+Múltiplos módulos de autenticação podem ser especificados, em cujo caso cada um é tentado em sequência, até que um deles seja bem-sucedido;
+Se a solicitação não puder ser autenticada, ela será rejeitada com o código de status HTTP 401. Caso contrário, o usuário será autenticado como um nome de usuário específico e o nome do usuário estará disponível para as etapas subsequentes a serem usadas nas decisões. Alguns autenticadores também fornecem as associações de grupo do usuário, enquanto outros autenticadores não;
+Enquanto o Kubernetes usa nomes de usuários para decisões de controle de acesso e no registro de solicitações, ele não possui um objeto de usuário, nem armazena nomes de usuários ou outras informações sobre usuários em seu armazenamento de objetos.
+
+Slide 07
+
+Autenticação
+
+A entrada para a etapa de autenticação é toda a solicitação HTTP, no entanto, normalmente apenas examina os cabeçalhos e/ou o certificado do cliente;
+Os módulos de autenticação incluem certificados de cliente, senha e tokens simples, tokens de bootstrap e tokens JWT (usados para contas de serviço);
+Múltiplos módulos de autenticação podem ser especificados, em cujo caso cada um é tentado em sequência, até que um deles seja bem-sucedido;
+Se a solicitação não puder ser autenticada, ela será rejeitada com o código de status HTTP 401. Caso contrário, o usuário será autenticado como um nome de usuário específico e o nome do usuário estará disponível para as etapas subsequentes a serem usadas nas decisões. Alguns autenticadores também fornecem as associações de grupo do usuário, enquanto outros autenticadores não;
+Enquanto o Kubernetes usa nomes de usuários para decisões de controle de acesso e no registro de solicitações, ele não possui um objeto de usuário, nem armazena nomes de usuários ou outras informações sobre usuários em seu armazenamento de objetos.
+
+Slide 08
+
+Controle de Admissão
+
+Vários controladores de admissão podem ser configurados. Cada um é chamado em ordem. Isso é mostrado como etapa 3 no diagrama;
+Ao contrário dos módulos de autenticação e autorização, se qualquer módulo do controlador de admissão rejeitar, a solicitação será imediatamente rejeitada;
+Além de rejeitar objetos, os controladores de admissão também podem definir padrões complexos para campos;
+Quando uma solicitação passa em todos os controladores de admissão, ela é validada usando as rotinas de validação para o objeto da API correspondente e, em seguida, gravada no armazenamento de objetos (mostrada na etapa 4).
+
+Slide 10
+
+O modelo RBAC
+
+Basicamente, o modelo RBAC é baseado em três componentes; Roles, ClusterRoles e Subjects. Todos os clusters k8s criam um conjunto padrão de ClusterRoles, representando divisões comuns nas quais os usuários podem ser colocados.
+
+

@@ -1,0 +1,100 @@
+Slide 05
+
+Tipos de recursos
+
+A CPU e a memória são um tipo de recurso. Um tipo de recurso tem uma unidade base. A CPU é especificada em unidades de núcleos e a memória é especificada em unidades de bytes.
+
+A CPU e a memória são coletivamente chamadas de recursos de computação ou apenas recursos. Recursos computacionais são quantidades mensuráveis que podem ser solicitadas, alocadas e consumidas. Eles são diferentes dos recursos da API. Recursos de API, como Pods e Serviços, são objetos que podem ser lidos e modificados por meio do servidor da API do Kubernetes.
+
+
+Slide 06
+
+kubectl create namespace dexter-limits
+
+cat aula04/limits/dexter-limit-range-1.yaml
+kubectl create -f aula04/limits/dexter-limit-range-1.yaml
+
+kubectl describe limitrange -n dexter-limits
+
+
+
+Limtes e Recursos Padrão
+
+No exemplo apresentado, vamos definir solicitações e limites padrão para contêineres no seu namespace. Esses valores padrão serão aplicados automaticamente a contêineres que não especificam suas solicitações e limites de recursos personalizados. 
+
+Memória
+Limites e pedidos de memória são medidos em bytes. Você pode expressar a memória como um inteiro simples ou como um inteiro de ponto fixo, usando um desses sufixos: E, P, T, G, M, K. Você também pode usar a potência de dois equivalentes: Ei, Pi, Ti Gi, Mi, Ki.
+
+CPU
+Valores fracionários são permitidos. Um contêiner que solicita 0,5 CPU, é garantido metade da CPU de um contêiner que solicita 1 CPU. Você pode usar o sufixo m para significar milli. Por exemplo, 100 m CPU, 100 mili CPU e 0,1 CPU são todos iguais. Precisão menor que 1m não é permitida.
+
+Descrição das opções
+limits: Define os limites de recursos padrão para memória;
+memory: Define o valor de uso de memória para o Pod;
+cpu: Define o valor de uso de CPU para o Pod;
+defaultRequest: Define as solicitações padrão para os contêineres em execução.
+
+
+Slide 07
+
+cat aula04/limits/limited-pod1.yaml
+kubectl create -f aula04/limits/limited-pod1.yaml
+
+kubectl describe pod limited-pod1 -n dexter-limits \
+| grep Limits -A 5
+
+kubectl describe node kube-node01.dexter.com.br | grep limited
+
+Slide 08
+
+cat aula04/limits/limited-pod2.yaml
+kubectl create -f aula04/limits/limited-pod2.yaml
+
+kubectl describe pod limited-pod2 -n dexter-limits \
+| grep Limits -A 5
+
+kubectl describe node kube-node01.dexter.com.br | grep limited
+
+Slide 09
+
+cat aula04/limits/limited-pod3.yaml
+kubectl create -f aula04/limits/limited-pod3.yaml
+kubectl get pod -o wide -n dexter-limits
+kubectl describe pod limited-pod3 -n dexter-limits
+
+Slide 10
+
+kubectl delete -f aula04/limits/limited-pod1.yaml
+kubectl delete -f aula04/limits/limited-pod2.yaml
+kubectl delete -f aula04/limits/limited-pod3.yaml
+kubectl delete -f aula04/limits/dexter-limit-range-1.yaml
+
+Slide 12
+
+cat aula04/limits/dexter-limit-range-2.yaml
+kubectl create -f aula04/limits/dexter-limit-range-2.yaml
+
+cat aula04/limits/limited-pod4.yaml
+kubectl create -f aula04/limits/limited-pod4.yaml
+
+Restrições mínimas e máximas
+
+No exemplo apresentado, mostra como definir valores mínimos e máximos para os recursos da CPU, usados por Containers e Pods em um namespace. Você especifica os valores mínimos e máximos da CPU em um objeto LimitRange. Se um Pod não atender às restrições impostas pelo LimitRange, ele não poderá ser criado no namespace.
+
+
+Slide 13
+
+kubectl describe pod limited-pod4 -n dexter-limits \
+| grep Limits -A 5
+
+kubectl describe node kube-node01.dexter.com.br | grep limited
+
+cat aula04/limits/limited-pod5.yaml
+kubectl create -f aula04/limits/limited-pod5.yaml
+
+kubectl delete -f aula04/limits/limited-pod4.yaml
+kubectl delete -f aula04/limits/dexter-limit-range-2.yaml
+
+
+
+

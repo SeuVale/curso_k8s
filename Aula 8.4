@@ -1,0 +1,30 @@
+Slide 05
+
+sudo systemctl status kubelet
+sudo systemctl status docker
+sudo sed -i '/ swap / s/^/#/' /etc/fstab 
+sudo swapoff -a
+sudo swapon -s
+
+sudo systemctl stop kubelet
+
+kubectl get nodes
+kubectl describe node kube-node02.dexter.com.br
+
+ping -c4 kube-node02.dexter.com.br
+
+sudo more /var/log/syslog | tail -100 | grep kubelet
+
+sudo systemctl start kubelet
+
+kubectl get nodes
+kubectl describe node kube-node02.dexter.com.br
+
+kubectl get pods -n kube-system
+
+POD=$(kubectl get pod -n kube-system | grep dexter-scheduler1 \
+| awk -F" " '{print $1}')
+
+
+
+

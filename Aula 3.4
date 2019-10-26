@@ -1,0 +1,62 @@
+Slide 05
+
+LoadBalancer Service
+
+Se você quiser expor diretamente um serviço, este é o método padrão. Todo o tráfego na porta que você especificar, será encaminhado para o serviço. Não há filtragem, roteamento, etc. Isso significa que você pode enviar quase qualquer tipo de tráfego para ele, como HTTP, TCP, UDP, Websockets, gRPC ou o que for.
+
+Slide 06
+
+Acessando uma aplicação via LoadBalancer
+
+O tráfego do balanceador de carga externo será direcionado aos pods de back-end, embora isso funcione dependendo exatamente do provedor da nuvem.
+
+Alguns provedores de nuvem permitem que você especifique o loadBalancerIP. Nesses casos, o balanceador de carga será criado com o loadBalancerIP especificado pelo usuário. Se o campo loadBalancerIP não for especificado, o loadBalancer será configurado com um endereço IP efêmero. Se você especificar um loadBalancerIP, mas seu provedor de nuvem não suportar o recurso, o campo loadbalancerIP que você definir será ignorado.
+
+Slide 07
+
+kubectl create deployment nginx --image=nginx
+kubectl scale deployment/nginx --replicas=2
+
+kubectl expose deployment nginx --port 80 --target-port 80 \
+--type LoadBalancer
+
+kubectl get all
+
+POD1=$(kubectl get pod | grep nginx | awk -F" " '{print $1}' \
+| head -1)
+echo $POD1
+
+POD2=$(kubectl get pod | grep nginx | awk -F" " '{print $1}' \
+| tail -1)
+echo $POD2
+
+
+Descrição dos comandos
+
+kubectl expose deployment: Exponha um recurso como um novo serviço do Kubernetes;
+--port 80: A porta na qual o serviço deve ser exibido;
+--target-port 80: Nome ou número da porta no contêiner, para o qual o serviço deve direcionar o tráfego;
+--type="LoadBalancer": Digite para este serviço: ClusterIP, NodePort, LoadBalancer ou ExternalName. O padrão é 'ClusterIP'.
+
+Slide 09
+
+kubectl cp: Copie arquivos e diretórios para os contêineres.
+
+echo 'POD 1 - LoadBalancer' > index.html
+kubectl cp index.html $POD1:/usr/share/nginx/html/
+
+echo 'POD 2 - LoadBalancer' > index.html
+kubectl cp index.html $POD2:/usr/share/nginx/html/
+
+
+kubectl get service nginx
+kubectl describe service nginx
+LB=$(kubectl get service | grep nginx | awk -F" " '{print $3}')
+curl http://$LB
+
+kubectl delete deployment nginx
+kubectl delete service nginx
+kubectl get all
+
+
+

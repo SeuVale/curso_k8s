@@ -1,0 +1,104 @@
+Slide 05
+
+cat aula07/auth-service-account/user-account.yaml 
+kubectl apply -f aula07/auth-service-account/user-account.yaml
+
+kubectl get serviceaccount operator -o yaml
+
+kubectl get secret
+
+
+
+Descrição dos comandos
+
+kubectl get serviceaccount: Lista as contas de usuário de serviço, disponíveis no Cluster; 
+-o yaml:  Exibe a saída das informações no formato YAML.
+
+
+Slide 06
+
+SEC=$(kubectl get secret | grep operator \
+| awk -F" " '{ print $1}')
+
+kubectl get secret $SEC -o yaml 
+
+
+Credenciais do usuário
+
+A maneira recomendada de autenticar para o apserver, é com uma credencial de conta de serviço. Por kube-system, um pod é associado a uma conta de serviço e uma credencial (token).
+Se disponível, um pacote de certificados é colocado na árvore do sistema de arquivos de cada container (ca.crt);
+Por fim, o espaço de nomes padrão a ser usado para operações de API com namespaces.
+
+
+
+Slide 07
+
+cat aula07/auth-service-account/kubectl-client.yaml
+
+kubectl apply -f aula07/auth-service-account/kubectl-client.yaml 
+
+kubectl get pods kubectl-client -o yaml | grep mountPath
+
+
+
+Cliente do Cluster
+
+Em nosso exemplo, o arquivo kubectl-client.yaml cria um pod que executa um container com a imagem k8s-kubectl:v1.10.4, fazendo o papel de cliente do cluster.
+
+
+
+Slide 08
+
+kubectl exec -it kubectl-client -- \
+ls /var/run/secrets/kubernetes.io/serviceaccount
+
+kubectl exec -it kubectl-client -- kubectl get pods
+kubectl exec -it kubectl-client -- kubectl get services
+kubectl exec -it kubectl-client -- kubectl get nodes
+
+Acessando a API de um pod
+
+A conta de serviço é colocada na árvore do sistema de arquivos de cada contêiner no pod, em /var/run/secrets/kubernetes.io/serviceaccount /token;
+O pacote de certificados é colocado na árvore do sistema de arquivos de cada container em /var/run/secrets/kubernetes.io/serviceaccount/ca.crt, e deve ser usado para verificar o certificado de serviço do apiserver;
+O namespace é colocado em um arquivo em /var/run/secrets/kubernetes.io/serviceaccount/namespace em cada contêiner.
+
+
+Slide 10
+
+cat aula07/auth-service-account/role-operator.yaml
+kubectl apply -f aula07/auth-service-account/role-operator.yaml
+
+cat aula07/auth-service-account/role-binding-operator.yaml
+kubectl apply -f \
+aula07/auth-service-account/role-binding-operator.yaml
+
+Slide 11
+
+kubectl get roles
+kubectl describe role operator-role
+
+kubectl get rolebindings
+kubectl describe rolebinding operator-role-binding
+
+kubectl exec -it kubectl-client -- kubectl get pods
+kubectl exec -it kubectl-client -- kubectl get services
+
+Slide 13
+
+kubectl get clusterrole | less
+kubectl describe clusterrole system:node
+cat aula07/auth-service-account/cluster-role-binding.yaml
+kubectl apply -f \
+aula07/auth-service-account/cluster-role-binding.yaml
+
+Slide 14
+
+kubectl get clusterrolebinding cluster-nodes
+kubectl describe clusterrolebinding cluster-nodes
+
+kubectl exec -it kubectl-client -- kubectl get nodes
+kubectl delete -f aula07/auth-service-account/kubectl-client.yaml
+
+
+
+

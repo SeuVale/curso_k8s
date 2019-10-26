@@ -1,0 +1,67 @@
+Slide 05
+
+Daemonsets
+
+Alguns usos típicos de um DaemonSet são:
+
+Executando um daemon de armazenamento em cluster, como glusterd e ceph em cada nó;
+Executando um daemon de coleta de logs em cada nó, como fluentd ou logstash;
+Executando um daemon de monitoramento de nó em cada nó, como Prometheus Node Exporter, Agente Sysdig, collectd, Dynatrace OneAgent, Agente AppDynamics, Agente SignalFx, agente Datadog, agente New Relic, Ganglia gmond ou agente Instana.
+
+Em um caso simples, um DaemonSet cobrindo todos os nós, seria usado para cada tipo de daemon. Uma configuração mais complexa pode usar vários DaemonSets para um único tipo de daemon, mas com diferentes sinalizadores e/ou solicitações de memória e CPU diferentes para diferentes tipos de hardware.
+
+Slide 06
+
+kubectl get daemonset --all-namespaces
+
+kubectl describe daemonset calico-node -n kube-system
+
+kubectl get pod -n kube-system -o wide | grep kube-proxy
+kubectl get pod -n kube-system -o wide | grep calico-node
+kubectl get pod -n kube-system -o wide | grep nginx
+
+
+
+Daemonsets
+
+Nos comandos apresentados, é possível observar que alguns componentes do Cluster já utilizam Daemonset, como é caso do Calico e Kube Proxy.
+O Daemonset calico-node instala o contêiner calico em todos os hosts do Cluster, para atender as solicitações de rede Calico.
+O Proxy do Kubernetes é responsável pelo roteamento do tráfego de rede para serviços de carga balanceada no cluster do Kubernetes. Para fazer seu trabalho, o proxy deve estar presente em todos os nós do cluster.
+
+Slide 07
+
+cat aula04/daemonset/node_exporter.yaml
+kubectl create -f aula04/daemonset/node_exporter.yaml
+
+kubectl get daemonset node-exporter
+
+kubectl describe daemonset node-exporter
+
+Slide 08
+
+kubectl label node kube-node01.dexter.com.br \
+monitoring=prometheus
+
+kubectl label node kube-node02.dexter.com.br \
+monitoring=prometheus
+
+kubectl get pods -o wide
+
+
+
+Slide 09
+
+
+kubectl label node kube-node01.dexter.com.br \
+monitoring=zabbix --overwrite
+kubectl get pods -o wide
+
+kubectl label node kube-node02.dexter.com.br \
+monitoring=zabbix --overwrite
+kubectl get pods -o wide
+
+
+
+kubectl label node <nome_do_node> --overwrite: Permite que os labels sejam substituídas.
+
+

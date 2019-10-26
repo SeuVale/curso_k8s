@@ -1,0 +1,68 @@
+Slide 04
+
+Sobre o Kubernetes
+
+O Google abriu o projeto Kubernetes em 2014. O Kubernetes baseia-se em uma década e meia de experiência do Google com a execução de cargas de trabalho de produção em grande escala, combinadas com as melhores ideias e práticas da comunidade.
+
+Por que preciso do Kubernetes e o que ele pode fazer?
+
+O Kubernetes possui vários recursos. Pode ser pensado como:
+Uma plataforma de contêiner;
+Uma plataforma de microsserviços;
+Uma plataforma de nuvem portátil e muito mais.
+
+O Kubernetes fornece um ambiente de gerenciamento centrado em contêineres. Ele orquestra a infraestrutura de computação, rede e armazenamento em nome das cargas de trabalho dos usuários. Isso fornece grande parte da simplicidade da Plataforma como Serviço (PaaS), com a flexibilidade da Infraestrutura como Serviço (IaaS) e permite a portabilidade entre os provedores de infraestrutura.
+
+Slide 06
+
+kube-apiserver
+
+O servidor da API do Kubernetes valida e configura dados para os objetos da API que incluem pods, serviços, controladores de replicação e outros. O API Server presta serviços à operações REST e fornece a interface para o estado compartilhado do cluster, através do qual todos os outros componentes interagem.
+
+Slide 07
+
+etcd
+
+O Kubernetes usa o etcd para armazenar todos os seus dados - seus dados de configuração, seu estado e seus metadados. O Kubernetes é um sistema distribuído, então ele precisa de um armazenamento de dados distribuído como o etcd. O etcd permite que qualquer um dos nós no cluster do Kubernetes leia e grave dados.
+
+Slide 08
+
+kuber-scheduler
+
+O agendador do Kubernetes é uma função específica da carga de trabalho, rica em políticas e com reconhecimento de topologia que afeta significativamente a disponibilidade, o desempenho e a capacidade. O escalonador precisa levar em conta requisitos de recursos individuais e coletivos, requisitos de qualidade de serviço, restrições de hardware / software / política, especificações de afinidade e antiafinidade, localidade de dados, interferência entre cargas de trabalho, prazos e assim por diante. Os requisitos específicos da carga de trabalho serão expostos por meio da API, conforme necessário.
+
+
+Slide 09
+
+kube-controller-manager
+
+O cloud-controller-manager permite que o código do fornecedor de serviços na nuvem e o código do Kubernetes evoluam independentemente uns dos outros. Em versões anteriores, o código principal do Kubernetes dependia de código específico do provedor de nuvem para funcionalidade. Em versões futuras, o código específico para os fornecedores de nuvem deve ser mantido pelo próprio fornecedor da nuvem e vinculado ao gerenciador do controlador de nuvem, durante a execução do Kubernetes.
+
+Os seguintes controladores possuem dependências de provedor de nuvem:
+
+Controlador de nó: Para verificar o provedor de nuvem para determinar se um nó foi excluído na nuvem, após parar de responder;
+Controlador de rotas: Para configurar rotas na infraestrutura de nuvem subjacente;
+Controlador de serviço: Para criar, atualizar e excluir balanceadores de carga do provedor de nuvem;
+Controlador de volume: Para criar, anexar, montar volumes e interagir com o provedor de nuvem para orquestrar volumes.
+
+Slide 10
+
+cloud-controller-manager
+
+O Docker Community Edition (CE), é ideal para desenvolvedores e pequenas equipes que querem começar a utilizar o Docker e experimentar aplicativos baseados em contêiner. O Docker CE possui três tipos de canais de atualização, stable, test e nightly:
+
+Stable: Fornece os últimos lançamentos para disponibilidade geral;
+Test: Fornece pré-versões que estão prontas para teste, antes da disponibilidade geral;
+Nightly: Oferece as mais recentes versões do trabalho em andamento, para o próximo grande lançamento.
+
+Slide 15
+
+Addons
+
+DNS: Embora os outros complementos não sejam estritamente necessários, todos os clusters do Kubernetes devem ter o DNS do cluster, pois muitos exemplos dependem dele;
+Web UI (Dashboard): O Dashboard é uma IU de uso geral, baseada na Web para clusters do Kubernetes. Ele permite que os usuários gerenciem e solucionem problemas de aplicativos em execução no cluster, bem como o próprio cluster;
+Monitoramento de Recurso de Contêiner: O Monitoramento de Recurso de Contêiner registra métricas genéricas de séries temporais sobre contêineres em um banco de dados central e fornece uma interface do usuário para navegação desses dados;
+Log de nível de cluster: Um mecanismo de criação de log em nível de cluster é responsável por salvar os logs de contêiner em um armazenamento de log central com interface de pesquisa / navegação.
+
+
+

@@ -1,0 +1,83 @@
+Slide 05
+
+cat aula05/deploy/nginx-deploy.yaml
+kubectl create -f aula05/deploy/nginx-deploy.yaml
+
+kubectl get pods -l app=nginx
+
+kubectl scale deployment/nginx-deploy --replicas=2
+kubectl get pods -l app=nginx
+
+
+Slide 06
+
+kubectl edit deployment/nginx-deploy
+spec:
+....
+DE:
+  replicas: 2
+PARA:
+  replicas: 4
+
+
+kubectl get pods -l app=nginx
+
+
+SLide 07
+
+kubectl get deployment nginx-deploy -o yaml > /tmp/ng-deploy.yaml
+
+vim /tmp/ng-deploy.yaml
+spec:
+....
+  replicas: 1
+
+kubectl replace -f /tmp/ng-deploy.yaml
+
+
+Slide 09
+
+horizontal pod autoscaler
+
+O Autoescalador Horizontal Pod é implementado como um recurso da API do Kubernetes e um controlador. O recurso determina o comportamento do controlador. O controlador ajusta periodicamente o número de réplicas em um controlador de replicação ou implementação para corresponder à utilização média da CPU observada para o destino especificado pelo usuário.
+
+Slide 10
+
+kubectl autoscale deployment/nginx-deploy \
+ --min=1 --max=3 --cpu-percent=80
+
+kubectl get hpa
+kubectl describe hpa nginx-deploy
+
+kubectl get pods -l app=nginx
+
+
+Descrição dos comandos:
+
+kubectl autoscale deployment: Cria um autoescalador que escolhe e define automaticamente o número de pods executados em um cluster do kubernetes;
+--min: Define o limite mínimo para o número de pods que podem ser definidos pelo autoescalador. Se não for especificado ou negativo, o servidor aplicará um valor padrão;
+--max: Define o limite máximo para o número de pods que podem ser definidos pelo autoescalador;
+--cpu-percent: Define a utilização média da CPU de destino (representada como uma porcentagem da CPU solicitada) em todos os pods. Se não for especificado ou negativo, uma política de escalonamento automático padrão será usada;
+kubectl get hpa: Lista os horizontal pod autoscaler, disponíveis no Cluster;
+kubectl describe hpa: Exibe detalhes de horizontal pod autoscaler.
+
+Slide 11
+
+kubectl edit hpa nginx-deploy
+spec:
+....
+DE:
+  minReplicas: 1
+PARA:
+  minReplicas: 2
+
+kubectl get pods -l app=nginx
+
+Slide 12
+
+kubectl describe hpa nginx-deploy
+kubectl delete hpa nginx-deploy
+kubectl delete -f aula05/deploy/nginx-deploy.yaml
+
+
+

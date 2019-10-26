@@ -1,0 +1,76 @@
+Slide 05
+
+cat aula06/configmap/mysql-secret.yaml
+kubectl apply -f aula06/configmap/mysql-secret.yaml
+
+kubectl get secrets
+
+kubectl describe secret mysql-secrets
+
+
+Slide 06
+
+cat aula06/configmap/mysql-configmap1.yaml
+kubectl create -f aula06/configmap/mysql-configmap1.yaml
+kubectl get configmaps
+kubectl describe configmap mysql-dexter-config
+
+
+
+ConfigMap para configuração de aplicações
+
+No exemplo apresentado, estamos criando um configMap para armazenar a configuração que será carregada pelo servidor MySQL no arquivo dexter.cnf;
+O arquivo dexter.cnf será montado por um volume persistente no Pod do diretório /etc/mysql/conf.d.
+
+
+Slide 07
+
+cat aula06/configmap/mysql-configmap2.yaml
+kubectl create -f aula06/configmap/mysql-configmap2.yaml
+
+kubectl get configmaps
+
+kubectl describe configmap mysql-dexter-db
+
+
+ConfigMap para criar banco e definir permissões aplicações
+
+No exemplo apresentado estamos criando um banco de nome dexter, utilizando a senha do root que armazena em um Secret;
+O configMap ainda concede privilégios ao usuário criado no Secret do banco de dados dexter.
+
+Slide 09
+
+cat aula06/configmap/mysql-deploy.yaml
+kubectl create -f aula06/configmap/mysql-deploy.yaml
+
+kubectl get pod -l app=mysql
+
+POD=$(kubectl get pods -o wide | grep mysql \
+| awk -F" " '{print $1}')
+
+
+Slide 10
+
+kubectl exec $POD env
+
+kubectl exec -it $POD -- ls /etc/mysql/conf.d
+kubectl exec -it $POD -- cat /etc/mysql/conf.d/dexter.cnf
+
+kubectl exec -it $POD -- ls /var/lib/mysql/dexter
+
+Slide 11
+
+HOST=$(kubectl get pod -o wide | grep mysql \
+| awk -F" " '{print $6}')
+mysql -h $HOST -u suporte -p4linux -D dexter
+
+SHOW DATABASES;
+EXIT
+
+kubectl delete -f aula06/configmap/mysql-deploy.yaml
+
+
+
+
+
+

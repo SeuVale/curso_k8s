@@ -1,0 +1,132 @@
+Slide 05
+
+kubectl get pods --all-namespaces
+
+kubectl describe node kube-node01.dexter.com.br \
+| grep IPv4IPIPTunnelAddr
+
+kubectl run pod1 --generator=run-pod/v1 \
+--image=alpine --restart Never -- /bin/sleep 999999
+
+IP da Rede
+
+Em nossa infraestutura, os Pods irão alocar IP nos containers da rede 192.168.0.0. A rede foi selecionada durante a configuração do Cluster, através do comando kubeadm:
+$ sudo kubeadm init –pod-network-cidr=192.168.0.0/16
+
+Container Network Interface (CNI)
+
+Você deve instalar um complemento de rede de pods para que seus pods possam se comunicar uns com os outros. A rede deve ser implantada antes de qualquer aplicativo. Além disso, o CoreDNS não será iniciado antes de uma rede ser instalada. O kubeadm suporta apenas redes baseadas em Container Network Interface (CNI) (e não suporta o kubenet).
+
+Plugins e Redes
+
+Calico: 192.168.0.0/16
+Canal: 10.244.0.0/16
+Cilium: 10.217.0.0/16
+Flannel: 10.244.0.0/16
+
+
+Slide 06
+
+kubectl run pod2 --generator=run-pod/v1 \
+--image=alpine --restart Never -- /bin/sleep 999999
+
+kubectl get pods -o wide
+
+kubectl exec -it pod1 -- ifconfig eth0
+kubectl exec -it pod2 -- ifconfig eth0
+
+Slide 07
+
+kubectl exec -it pod1 -- ping -c4 <IP_POD2>
+kubectl exec -it pod2 -- ping -c4 <IP_POD1>
+
+kubectl delete pod pod1
+kubectl delete pod pod2
+
+kubectl get pods
+
+Slide 09
+
+NodePort Service
+
+Basicamente, um serviço NodePort tem duas diferenças de um serviço normal “ClusterIP”. Primeiro, o tipo é "NodePort". Há também uma porta adicional chamada nodePort que especifica qual porta abrir nos nós. Se você não especificar essa porta, ela selecionará uma porta aleatória. Na maioria das vezes você deve deixar o Kubernetes escolher a porta.
+
+
+Slide 10
+
+Acessando uma aplicação via NodePort
+
+Um serviço NodePort é a forma mais primitiva de obter o tráfego externo, diretamente para o seu serviço. NodePort, como o nome indica, abre uma porta específica em todos os Nós (as VMs) e qualquer tráfego enviado a essa porta é encaminhado para o serviço.
+
+Como você está usando portas não padrão, geralmente é necessário configurar um balanceador de carga externo que ouve as portas padrão e redireciona o tráfego para o <NodeIp>: <NodePort>.
+
+Observações sobre o NodePort:
+
+Você só pode ter um serviço por porta.
+Você só pode usar as portas 30000–32767.
+Se o seu endereço IP do Nó / VM mudar, é preciso avisar quem está acessando a aplicação.
+
+
+Slide 11
+
+kubectl create deployment nginx --image=nginx
+kubectl get pods
+kubectl get deployments
+kubectl expose deployment/nginx --type="NodePort" --port 80
+
+Descrição dos comandos
+
+kubectl expose deployment: Exponha um recurso como um novo serviço do Kubernetes;
+--type="NodePort": Digite para este serviço: ClusterIP, NodePort, LoadBalancer ou ExternalName. O padrão é 'ClusterIP';
+--port 80: A porta na qual o serviço deve ser exibido.
+
+
+Slide 12
+
+kubectl get services
+kubectl describe service nginx
+kubectl get endpoints
+
+Descrição dos comandos
+
+kubectl get services: Lista os serviços disponíveis no Cluster. Como padrão, somente os serviços do namespaces defauilt serão listados. Para listar serviços sobre outros namespaces, passe a flag -n <nome_do_namespace>;
+kubectl describe service: Exibe informações sobre um Serviço;
+kubectl get endpoints: Lista os endpoints, disponivel no Cluster.
+
+O que são endpoints em um Cluster?
+
+Os Endpoints são listas de endereços para os quais seus serviços enviarão tráfego. Esses pontos de extremidade (endpoints_) podem ser atualizados automaticamente, por meio de rótulos e seletores, ou você pode configurar manualmente seus pontos de extremidade, dependendo do seu caso de uso.
+
+Slide 13
+
+curl http://127.0.0.1:$NodePort
+curl http://200.100.50.100:$NodePort
+
+kubectl get pods -o wide
+
+http://200.100.50.10x:$NodePort
+
+
+Slide 14
+
+kubectl delete service nginx
+kubectl get services
+
+kubectl delete deployment nginx
+kubectl get deployments
+
+kubectl delete service: Remove um Serviço do cluster. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

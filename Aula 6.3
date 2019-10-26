@@ -1,0 +1,118 @@
+Slide 05
+
+O recurso StorageClass
+
+Cada StorageClass contém o provisionador de campos, parâmetros e reclaimPolicy que são usados quando um PersistentVolume pertencente à classe precisa ser provisionado dinamicamente;
+O nome de um objeto StorageClass é significativo e é como os usuários podem solicitar uma classe específica. Os administradores definem o nome e outros parâmetros de uma classe ao criar primeiro objetos StorageClass e os objetos não podem ser atualizados depois de criados.
+
+Slide 06
+
+cat aula06/storage/storage-class.yaml
+kubectl create -f aula06/storage/storage-class.yaml
+
+kubectl get sc
+
+kubectl describe sc local-storage
+
+Descrição das opções
+
+provisioner: Determina qual plug-in de volume é usado para provisionar Pvs;
+volumeBindingMode: Permite controlar quando a vinculação de volume e o provisionamento dinâmico devem ocorrer. O valor WaitForFirstConsumer atrasará a vinculação e o provisionamento de um PersistentVolume, até que um Pod usando PersistentVolumeClaim seja criado. 
+
+Descrição dos comandos
+
+kubectl get sc: Lista os Storage Class, disponíveis no Cluster;
+kubectl describe sc: Exibe detalhes de um Storage Class.
+
+
+Slide 08
+
+Persistente Volume e Persistent Volume Claim
+
+Um PersistentVolumeClaim (PVC) é uma solicitação de armazenamento por usuário. É semelhante a um pod. Os pods consomem recursos de nós e os PVCs consomem recursos de PV. Os pods podem solicitar níveis específicos de recursos (CPU e memória). As reivindicações podem solicitar modos específicos de tamanho e acesso (por exemplo, podem ser montados uma vez lido / gravado ou muitas vezes somente leitura);
+Enquanto PersistentVolumeClaims permitem que um usuário consuma recursos de armazenamento abstratos, é comum que os usuários precisem de PersistentVolumes com propriedades variáveis, como desempenho para diferentes problemas. Os administradores de cluster precisam ser capazes de oferecer uma variedade de PersistentVolumes que diferem em mais maneiras do que apenas os modos de tamanho e acesso, sem expor os usuários aos detalhes de como esses volumes são implementados. Para essas necessidades, há o recurso StorageClass.
+
+Slide 09
+
+cat aula06/local/volume-local.yaml
+kubectl create -f aula06/local/volume-local.yaml
+
+kubectl get pv
+kubectl describe pv pv-local
+
+ssh kube-node01 mkdir data
+
+
+Descrição das opções
+
+capacity: Define a capacidade de armazenamento do volume; 
+accessModes: Define o modo de acesso ao volume. O valor ReadWriteOnce permite que o volume possa ser montado como leitura-gravação por um único nó. No valor ReadOnlyMany o volume pode ser montado somente para leitura por muitos nós e no valor ReadWriteMany o volume pode ser montado como leitura-escrita por muitos nós;
+persistentVolumeReclaimPolicy: Define o que acontece com um volume persistente, quando liberado de sua reivindicação. As opções válidas são Retain (padrão para PersistentVolumes, criados manualmente), Delete (padrão para PersistentVolumes, provisionados dinamicamente) e Recycle (reprovado). A reciclagem deve ser suportada pelo plug-in de volume subjacente a este PersistentVolume;
+storageClassName: Define o nome do Storage Class.
+
+Descrição dos comandos
+
+kubectl get pv: Lista os Volumes Persistentes, disponíveis no Cluster;
+kubectl describe pv: Exibe detalhes de um Volume Persistente.
+
+
+Slide 10
+
+
+cat aula06/local/claim.local.yaml
+kubectl create -f aula06/local/claim.local.yaml
+
+kubectl get pvc
+
+kubectl describe pvc volume-claim-local
+
+
+
+Descrição das opções
+
+resources: Define a solicitação de armazenamento. O mesmo modelo de recurso se aplica a volumes e volume claim;
+requests: PVCs são solicitações para esses recursos e também atuam como verificações de declaração para o recurso.
+
+Descrição dos comandos
+
+kubectl get pvc: Lista os Volumes Persistentes Claim, disponíveis no Cluster;
+kubectl describe pvc: Exibe detalhes de um Volume Persistente Clim.
+
+Slide 11
+
+cat aula06/local/nginx-deploy1.yaml
+kubectl create -f aula06/local/nginx-deploy1.yaml
+
+kubectl get pod -l app=nginx -o wide
+
+POD=$(kubectl get pods | grep nginx-deploy \
+| awk -F" " '{print $1}')
+
+
+Descrição das opções
+
+volumeMounts: Define as opções de montagem; 
+mountPath: Define a localização do volume no sistema de arquivo no Pod;
+PersistentVolumeClaim: Define as regras de ligação ao volume claim;
+claimName: Define o nome do volume claim.
+
+
+Slide 12
+
+kubectl exec -it $POD -- mount | grep nginx
+
+HOST=$(kubectl get pods -o wide | grep nginx-deploy \
+| awk -F" " '{print $6}')
+
+curl $HOST
+
+Slide 13
+
+echo 'Servidor Nginx - Node 01' > index.html
+scp index.html kube-node01:data/
+
+curl $HOST
+
+kubectl delete -f aula06/local/nginx-deploy1.yaml
+
+

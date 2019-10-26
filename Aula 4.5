@@ -1,0 +1,111 @@
+Slide 06
+
+kubectl get pods -n kube-system
+kubectl describe pod -n kube-system \
+kube-scheduler-kube-master.dexter.com.br
+
+
+
+Scheduler Padrão
+
+O Kubernetes implementa contêineres organizados em Pods, que residem em agrupamentos lógicos de recursos chamados Nodes. Os requisitos específicos de uma carga de trabalho são definidos por meio de uma API. O agendador do Kubernetes tenta corresponder cada Pod criado pelo Kubernetes, a um conjunto adequado de recursos de TI em um Nó. Ele também pode distribuir cópias de Pods em diferentes nós para alta disponibilidade, se esse recurso for desejado.
+
+Se o agendador do Kubernetes não encontrar o hardware que atenda aos requisitos e especificações do Pod, das regras de afinidade e anti-afinidade às configurações de qualidade de serviço, esse Pod não será agendado e o agendador o repetirá até que uma máquina seja disponibilizada.
+
+
+Slide 07
+
+kubectl edit clusterrole system:kube-scheduler
+...
+<ADICIONAR NO FINAL>
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  verbs:
+  - watch
+  - list
+  - get
+
+
+Cluster Role
+
+Se o RBAC estiver ativado em seu cluster, você deverá atualizar a função de cluster system: kube-scheduler. Inclua em seu planejador, regras de acesso ao recurso storageclasses para listar e exibir informações.
+
+
+Descrição das opções
+
+--address: O endereço do servidor da API do Kubernetes;
+--leader-elect: Inicia um cliente de eleição de líder e ganha liderança, antes de executar o loop principal. Habilita isso ao transmitir componentes replicados para alta disponibilidade;
+livenessProbe: Especifica que o kubelet deve executar uma sonda de atividade a cada 15 segundos;
+readinessProbe: Verifica se o contêiner está no estado Ready.
+
+Slide 08
+
+cat aula04/schedulers/kube1-scheduler.yaml 
+cat aula04/schedulers/kube2-scheduler.yaml
+
+kubectl create -f aula04/schedulers/kube1-scheduler.yaml
+kubectl get pod -o wide -n kube-system | grep dexter-scheduler1
+
+kubectl create -f aula04/schedulers/kube2-scheduler.yaml
+kubectl get pod -o wide -n kube-system | grep dexter-scheduler2
+
+Slide 09
+
+POD1=$(kubectl get pod -n kube-system | grep dexter-scheduler1 \
+| awk -F" " '{print $1}')
+kubectl logs $POD1 -n kube-system
+
+POD2=$(kubectl get pod -n kube-system | grep dexter-scheduler2 \
+| awk -F" " '{print $1}')
+kubectl logs $POD2 -n kube-system
+
+
+
+Slide 11
+
+cat aula04/schedulers/pod1.yaml
+kubectl create -f aula04/schedulers/pod1.yaml
+
+kubectl describe pod pod1 | grep Scheduled
+
+kubectl get pod -o wide | grep pod1
+
+
+schedulerName
+
+No exemplo apŕesentado, é possível observar o nome do planejador especificado, como um argumento para o comando do planejador na especificação do contêiner que deve ser exclusivo. Esse é o nome que corresponde ao valor do schedulerName opcional nos pods, para determinar se esse agendador é responsável pelo agendamento de um determinado pod.
+
+Slide 12
+
+cat aula04/schedulers/pod2.yaml
+kubectl create -f aula04/schedulers/pod2.yaml
+
+kubectl describe pod pod2 | grep Scheduled
+
+kubectl get pod -o wide | grep pod2
+
+
+Slide 13
+
+kubectl get events
+
+kubectl get events -n kube-system | grep dexter-scheduler
+
+kubectl get events | grep pod1
+kubectl get events | grep pod2
+
+
+Eventos no Kubernetes
+
+Os eventos do Kubernetes são um tipo de recurso no Kubernetes, criados automaticamente quando outros recursos possuem alterações de estado, erros ou outras mensagens que devem ser transmitidas para o sistema. O comando get events exibe informações sobre recursos no Cluster.
+
+
+Slide 14
+
+kubectl delete -f aula04/schedulers/pod1.yaml 
+kubectl delete -f aula04/schedulers/pod2.yaml
+
+kubectl get events --watch
+CTRL + C

@@ -1,0 +1,63 @@
+Slide 05
+
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+-keyout nginx1-tls.key -out nginx1-tls.crt \
+-subj "/CN=nginx1.dexter.com.br/O=DexterCourierMatriz/OU=DevOps"
+
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+-keyout nginx2-tls.key -out nginx2-tls.crt \
+-subj "/CN=nginx2.dexter.com.br/O=DexterCourierFilial/OU=BigData"
+
+
+Slide 06
+
+kubectl create secret tls certificado1-nginx-tls \
+--key nginx1-tls.key --cert nginx1-tls.crt
+
+kubectl create secret tls certificado2-nginx-tls \
+--key nginx2-tls.key --cert nginx2-tls.crt
+
+kubectl get secrets
+
+Secrets
+
+Os objetos secretos do Kubernetes permitem armazenar e gerenciar informações confidenciais, como senhas, tokens OAuth e chaves ssh.
+
+Descrição dos comandos
+
+kubectl create secret: Crie um segredo, usando o subcomando especificado;
+tls: Crie um segredo de TLS;
+--key: Caminho para a chave privada, associada ao certificado fornecido;
+--cert: Caminho para o certificado de chave pública, codificada pelo PEM;
+kubectl list secret: Lista os segredos disponíveis por namespaces.
+
+
+Slide 08
+
+cat aula03/ingress/tls/deploy-nginx.yaml 
+kubectl create -f aula03/ingress/tls/deploy-nginx.yaml
+
+cat aula03/ingress/web-nginx.sh
+bash aula03/ingress/web-nginx.sh
+
+cat aula03/ingress/tls/ingress-tls-nginx.yaml
+kubectl create -f aula03/ingress/tls/ingress-tls-nginx.yaml 
+
+Acessando uma aplicação via Ingress
+
+Se você estiver executando múltiplos controladores de entrada, ou executando em um provedor de nuvem que manipula nativamente ingresso como o GKE, você precisa especificar a anotação kubernetes.io/ingress.class: "nginx", em todos os ingressos que você deseja que o ingresso controlador nginx possa reivindicar.
+
+
+Slide 09
+
+kubectl describe ingress ingress1-tls-nginx
+kubectl describe ingress ingress2-tls-nginx
+
+curl -kivL https://nginx1.dexter.com.br
+curl -kivL https://nginx2.dexter.com.br
+
+kubectl delete -f aula03/ingress/tls
+
+
+
+

@@ -1,0 +1,72 @@
+Slide 05
+
+cat aula07/network-policy/nginx-deploy.yaml
+kubectl create -f aula07/network-policy/nginx-deploy.yaml
+
+kubectl run --rm -ti busybox --generator=run-pod/v1 \
+--image=busybox /bin/sh
+
+wget --spider --timeout=1 nginx
+exit
+
+
+Slide 06
+
+cat aula07/network-policy/allow-policy.yaml
+kubectl apply -f aula07/network-policy/allow-policy.yaml
+
+kubectl get networkpolicy
+kubectl describe networkpolicy access-nginx
+
+kubectl run --rm -ti busybox --generator=run-pod/v1 \
+--image=busybox /bin/sh
+
+Descrição das opções
+
+No exemplo apresentado, estamos definindo que somente os pods que possuem um label access com o valor true, tenham acesso a aplicação Nginx:
+
+Slide 07
+
+wget --spider --timeout=1 nginx
+exit
+
+kubectl run --rm -ti --labels="access=true" busybox \
+--generator=run-pod/v1 --image=busybox /bin/sh
+
+wget --spider --timeout=1 nginx
+exit
+
+
+Slide 09
+
+kubectl delete -f aula07/network-policy/allow-policy.yaml
+
+kubectl get pod -l app=nginx -o wide
+
+POD=$(kubectl get pod -l app=nginx -o wide \
+| awk -F" " '{print $6}' | tail -1)
+curl $POD
+
+
+Slide 10
+
+cat aula07/network-policy/ipblock-policy.yaml
+kubectl create -f aula07/network-policy/ipblock-policy.yaml
+
+curl $POD
+
+kubectl delete -f aula07/network-policy/ipblock-policy.yaml 
+curl $POD
+
+
+Descrição das opções
+
+No exemplo apresentado, estamos definindo que os pods que estão em uma determinada rede, não tenham tenham acesso a aplicação Nginx:
+
+
+Slide 11
+
+kubectl delete -f aula07/network-policy/nginx-deploy.yaml 
+kubectl get all -l app=nginx
+
+

@@ -1,0 +1,66 @@
+Slide 04
+Sobre o Kubernetes
+
+O Google abriu o projeto Kubernetes em 2014. O Kubernetes baseia-se em uma década e meia de experiência do Google com a execução de cargas de trabalho de produção em grande escala, combinadas com as melhores ideias e práticas da comunidade.
+
+Por que preciso do Kubernetes e o que ele pode fazer?
+
+O Kubernetes possui vários recursos. Pode ser pensado como:
+Uma plataforma de contêiner;
+Uma plataforma de microsserviços;
+Uma plataforma de nuvem portátil e muito mais.
+
+O Kubernetes fornece um ambiente de gerenciamento centrado em contêineres. Ele orquestra a infraestrutura de computação, rede e armazenamento em nome das cargas de trabalho dos usuários. Isso fornece grande parte da simplicidade da Plataforma como Serviço (PaaS), com a flexibilidade da Infraestrutura como Serviço (IaaS) e permite a portabilidade entre os provedores de infraestrutura.
+
+Slide 05
+
+Uso de Containers
+
+Os contêineres permitem separar aplicativos da infraestrutura subjacente e isolá-los do ambiente do host, usando um sistema de arquivos autônomo, redes virtuais e dependências. Esse isolamento torna os contêineres muito mais portáteis e fáceis de implantar que as Vms.
+
+No entanto, as tecnologias de contêineres, como o Docker, não abordam totalmente o desafio de executar aplicativos em contêiner na produção. O Docker ofereceu o Swarm (e ainda faz) para a orquestração, mas o Swarm, no final das contas, não ofereceu tanto quanto o K8s. Pense nisso por um momento: os aplicativos de produção reais incluem vários contêineres implantados em vários hosts de servidor. Quando você gerencia centenas ou milhares de contêineres em vários nós em produção, você precisa escaloná-los dependendo da carga do aplicativo, habilitar comunicação e acesso externo (por exemplo, por meio de microsserviços), armazenamento, execução de verificações regulares de integridade, gerenciamento de atualizações e muitas outras tarefas. 
+
+Essas são todas as tarefas de orquestração que não saem da caixa nos tempos de execução do contêiner. Desenvolver sua própria estrutura de orquestração para executar essas tarefas seria uma sobrecarga desnecessária para o seu negócio.
+
+
+Slide 06
+
+Escalabilidade
+
+Algumas das perguntas que podem surgir ao longo do caminho:
+
+O número desejado de instâncias de aplicativos está em execução?
+Quantas dessas instâncias são saudáveis e estão prontas para atender ao tráfego?
+Qual é a carga atual do aplicativo? Quantas réplicas são necessárias para atender essa carga?
+Quantos nós estão disponíveis atualmente para agendamento? 
+Quantos recursos estão disponíveis no cluster?
+
+Estas são apenas algumas perguntas que podem tornar um administrador de cluster sem ferramentas apropriadas e enlouquecer. A solução óbvia é a automação, e é aí que o Kubernetes realmente brilha.
+
+
+Slide 07
+
+Rede eficiente
+
+Comunicação contêiner à contêiner: No host local e utilizando o namespace de rede de um pod. Essa camada de rede permite que as interfaces de rede do contêiner, contenham contêineres fortemente acoplados que podem se comunicar entre si em portas especificadas, muito semelhantes às aplicações convencionais;
+Comunicação de pod-para-pod: Que permite a comunicação de pods nos nós. O Kubernetes pode transformar o cluster em uma rede virtual, onde todos os pods podem se comunicar uns com os outros, não importando em quais nós eles se conectam;
+Serviços: Uma abstração de Serviço define uma política (microsserviço) para acessar pods por outros aplicativos. Os serviços agem como balanceadores de carga que distribuem solicitações em pods de back-end gerenciados pelo serviço.
+
+
+Slide 08
+
+Volumes Persistente
+
+Volumes persistentes permitem reservar a quantidade necessária de recursos, usando reivindicações de volume persistentes. A reivindicação é vinculada automaticamente à volumes que correspondem ao tipo de armazenamento, à capacidade e a outros requisitos especificados na reivindicação. As reclamações também são automaticamente desvinculadas se um volume correspondente não existir. Esse recurso permite reservar de forma eficiente o armazenamento por aplicativos em execução no cluster do Kubernetes.
+
+
+Slide 09
+
+Plugins
+
+Alguns frameworks pluggin suportados pelo Kubernetes incluem:
+
+Plugins CNI (Container Network Interface): Implementam o modelo de rede CNI e são projetados para interoperabilidade;
+Os plug-ins de volume fora da árvore, como a Container Storage Interface (CSI) e o FlexVolume. Eles permitem que os fornecedores de armazenamento criem plug-ins de armazenamento personalizados, sem adicioná-los ao repositório do Kubernetes.
+
+

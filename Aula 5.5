@@ -1,0 +1,86 @@
+SLide 05
+
+ReplicaSet
+
+Um ReplicaSet garante que um número especificado de réplicas de pod está sendo executado a qualquer momento. No entanto, um Deploy é um conceito de nível mais alto que gerencia o ReplicaSets e fornece atualizações declarativas para os Pods, além de vários outros recursos úteis. Portanto, é recomendado o uso de deploys em vez de usar diretamente o ReplicaSets, a menos que você exija orquestração de atualização personalizada ou não precise de atualizações.
+
+Slide 06
+
+cat aula05/replicaset/nginx-replicaset.yaml
+kubectl create -f aula05/replicaset/nginx-replicaset.yaml
+
+kubectl get rs -l app=web
+
+kubectl describe rs nginx-replicas
+
+Slide 07
+
+kubectl edit rs nginx-replicas
+....
+DE:
+spec:
+  replicas: 3
+PARA:
+spec:
+  replicas: 4
+
+kubectl get pods -l app=web
+
+Slide 08
+
+POD=$(kubectl get pods -l app=web | awk -F" " '{print $1}' \
+| tail -1)
+echo $POD
+
+kubectl delete pod $POD
+kubectl get pods -l app=web
+
+kubectl delete -f aula05/replicaset/nginx-replicaset.yaml
+
+Slide 10
+
+StatefulSets
+
+Um StatefulSet opera sob o mesmo padrão de qualquer outro Controller. Você define seu estado desejado em um objeto StatefulSet e o controlador StatefulSet faz as atualizações necessárias para chegar lá, a partir do estado atual.
+
+Slide 11
+
+cat aula05/statefulset/httpd-service.yaml
+kubectl create -f aula05/statefulset/httpd-service.yaml
+kubectl describe service httpd-service
+
+cat aula05/statefulset/httpd-statefulset.yaml
+kubectl create -f aula05/statefulset/httpd-statefulset.yaml
+
+Slide 12
+
+kubectl get statefulset
+kubectl describe statefulset apache-http
+kubectl get pods -l app=httpd
+kubectl scale statefulset apache-http --replicas=4
+kubectl describe statefulset apache-http
+
+
+Slide 13
+
+kubectl patch: Atualiza um ou mais campos de um recurso, usando patch de mesclagem estratégica, um patch de mesclagem JSON ou um patch JSON.
+
+kubectl get pods -l app=httpd
+kubectl patch sts apache-http -p '{"spec":{"replicas":2}}'
+kubectl get statefulset
+kubectl describe statefulset apache-http
+kubectl get pods -l app=httpd
+
+
+Slide 14
+
+kubectl patch statefulset apache-http --type='json' \
+-p='[{"op": "replace", "path": \
+"/spec/template/spec/containers/0/image", "value":"httpd:2-alpine"}]'
+
+kubectl describe statefulset apache-http
+
+kubectl delete statefulset apache-http
+kubectl delete service httpd-service
+
+

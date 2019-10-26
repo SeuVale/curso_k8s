@@ -1,0 +1,127 @@
+Slide 05
+
+Como o DNS do Kubernetes funciona?
+
+No Kubernetes, você pode configurar um sistema DNS com dois complementos bem suportados: CoreDNS e Kube-DNS. O CoreDNS é um complemento mais recente que se tornou um servidor DNS padrão no Kubernetes v1.12. No entanto, o Kube-DNS ainda pode ser instalado como um sistema DNS padrão por certas ferramentas do instalador do Kubernetes.
+
+Ambos os complementos agendam um pod de DNS ou pods e um serviço com um IP estático no cluster, e ambos são denominados kube-dns no campo metadata.name para interoperabilidade. Quando o cluster é configurado pelo administrador ou ferramentas de instalação, o kubelet passa a funcionalidade do DNS para cada contêiner com o sinalizador --cluster-dns = <dns-service-ip>. Ao configurar o kubelet, o administrador também pode especificar o nome de um domínio local, usando o sinalizador --cluster-domain = <default-local-domain>.
+
+Os add-ons DNS do Kubernetes, atualmente, suportam pesquisas diretas (registros A), pesquisas de porta (registros SRV), pesquisas de endereço IP reverso (registros PTR) e algumas outras opções. Nas seções a seguir, discutimos o esquema de nomeação do Kubernetes para pods e serviços dentro desses tipos de registros.
+
+
+Slide 06
+
+ls aula03/pods
+
+cat aula03/pods/pod1.yaml
+cat aula03/pods/pod2.yaml
+
+kubectl apply -f aula03/pods/pod1.yaml
+kubectl apply -f aula03/pods/pod2.yaml
+
+
+Descrição
+
+Acompanhe a explicação dos objetos do arquivo YAML:
+
+apiVersion: Define a versão da API do Kubernetes que você está usando para criar o objeto;
+kind: Que tipo de objeto você deseja criar;
+metadata: Dados que ajudam a identificar exclusivamente o objeto;
+labels: Pares de valor-chave, usados principalmente para agrupar e categorizar o objeto;
+name: Define o nome do Pod;
+namespace: Define em qual namespace o Pod será criado;
+spec: Declara o estado desejado e as características do objeto que queremos ter;
+args: Define argumentos como comandos durante a execução do container no Pod;
+image: Define o nome da imagem Docker que será utilizada para executar o container no Pod.
+name: Define o nome do container que será executado no Pod.
+
+Convertendo manifesto YAML para linha de comando
+
+pod1.yaml: 
+kubectl run pod1 --generator=run-pod/v1 --image=alpine -- /bin/sleep 999999
+
+pod2.yaml: 
+kubectl run pod2 --generator=run-pod/v2 --image=alpine -- /bin/sleep 999999
+
+Slide 07
+
+kubectl create -f https://k8s.io/examples/admin/dns/busybox.yaml
+
+kubectl get pods -o wide
+
+kubectl get pod busybox -o yaml
+
+Slide 08
+
+kubectl exec -ti busybox -- nslookup kubernetes
+kubectl exec -ti busybox -- nslookup \
+kube-dns.kube-system.svc.cluster.local
+
+kubectl get service -n kube-system | grep dns
+
+kubectl exec -ti busybox -- nslookup \
+kube-dns.kube-system.svc.cluster.local
+
+
+DNS Interno do Kubernetes
+
+Um registro do tipo A de um registro DNS, é usado para apontar um domínio ou subdomínio para um determinado endereço IP. O registro consiste no nome do domínio, no endereço IP para resolvê-lo e no TTL em segundos. 
+Os serviços recebem um registro DNS do tipo A para um nome na forma seu-serviço.seu-namespace.svc.cluster.local (o nome do domínio raiz pode ser alterado nas configurações do kubelet). Esse nome resolve o IP do cluster do Serviço. Os serviços "Headless" também recebem um registro DNS A para um nome da forma seu-serviço-namespace.svc.cluster.local. No entanto, em contraste com um serviço, esse nome é resolvido para um conjunto de IPs dos conjuntos selecionados pelo serviço;
+O DNS não resolverá esse conjunto para um IP específico, automaticamente para que os clientes cuidem do balanceamento de carga ou da seleção round-robin do conjunto.
+
+
+Slide 09
+
+kubectl get pods -o wide
+
+kubectl exec -ti busybox -- nslookup \
+<IP-DO-POD-POD1>.default.pod.cluster.local
+
+kubectl exec -ti busybox -- nslookup \
+<IP-DO-POD-POD2>.default.pod.cluster.local
+
+DNS Interno do Kubernetes
+
+Se o DNS estiver ativado, os pods receberão um registro DNS A na forma de pod-ip-address.my-namespace.pod.cluster.local. Por exemplo, um pod com IP 172.10.1.2 no namespace default com um nome DNS de cluster.local, teria uma entrada no formato 172-10-1-2.default.pod.cluster.local.
+
+
+Slide 11
+
+cat aula03/pods/dns-pod.yaml
+kubectl apply -f aula03/pods/dns-pod.yaml
+
+kubectl get pods -o wide
+
+kubectl exec -ti dns-dexter -- nslookup \
+<IP-DO-POD-POD1>.default.pod.cluster.local
+
+
+Descrição das opções
+
+dnsPolicy: Define quais serão as politicas utilizadas na configuração de DNS. "None" permite que um pod ignore as configurações de DNS do ambiente do Kubernetes. As outras opções são "ClusterFirstWithHostNet", "ClusterFirst" e "Defult";
+dnsConfig: Define as configurações personalizadas para o DNS;
+nameservers: Define a lista dos servidores de Nomes que o Pod irá consultar;
+searches:Define a lista de domínios que o Pod irá consultar;
+options: Uma lista opcional de objetos, onde cada objeto pode ter uma propriedade de nome (obrigatório) e uma propriedade de valor (opcional).
+
+
+Slide 12
+
+kubectl exec -ti dns-dexter -- ping -c4 wordpress.dexter.com.br
+kubectl exec -ti dns-dexter -- ping -c4 nginx1.dexter.com.br
+
+kubectl delete -f aula03/pods
+
+kubectl delete -f https://k8s.io/examples/admin/dns/busybox.yaml
+
+
+DNS Externo
+
+Em nosso exemplo, o Pod dns-dexter consegue resolver os nomes balancer.dexter.com.br e registry.dexter.com.br, devido a configuração de DNS que aponta para o servidor Balancer com IP 200.100.200.200.
+
+
+
+
+
+
+

@@ -1,0 +1,79 @@
+Slide 05
+
+sudo apt install nfs-common -y
+showmount -e balancer
+
+Slide 06
+
+cat aula06/nfs/volume-nfs.yaml
+kubectl create -f aula06/nfs/volume-nfs.yaml
+
+kubectl get pv
+kubectl describe pv nfs-volume
+
+Slide 07
+
+cat aula06/nfs/claim-nfs.yaml
+kubectl create -f aula06/nfs/claim-nfs.yaml
+
+kubectl get pvc
+kubectl describe pvc pvc-nfs
+
+Slide 09
+
+cat aula06/nfs/nginx-deploy2.yaml
+kubectl create -f aula06/nfs/nginx-deploy2.yaml
+
+kubectl get pods -l app=nginx -o wide
+
+ssh kube-node01 sudo df -Th | grep nfs
+
+Slide 10
+
+POD=$(kubectl get pods | grep nginx-deploy \
+| awk -F" " '{print $1}')
+kubectl exec -it $POD -- df -Th
+
+HOST=$(kubectl get pod -o wide | grep nginx-deploy \
+| awk -F" " '{print $6}')
+
+curl $HOST
+
+Slide 11
+
+echo 'Curso Kubernetes 4Linux' > index.html
+scp index.html balancer:data/
+
+curl $HOST
+
+kubectl get pod -l app=nginx -o wide
+
+Slide 12
+
+kubectl edit deployment nginx-deploy
+DE:
+      nodeSelector:
+        cloud: AWS
+PARA:
+      nodeSelector:
+        cloud: AZURE
+
+kubectl get pods -l app=nginx -o wide
+
+Slide 13
+
+ssh kube-node02 sudo df -Th | grep nfs
+
+HOST=$(kubectl get pod -o wide | grep nginx-deploy \
+| awk -F" " '{print $6}')
+curl $HOST
+
+kubectl delete -f aula06/nfs/nginx-deploy2.yaml
+
+
+
+
+
+
+
+

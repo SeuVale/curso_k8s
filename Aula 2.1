@@ -1,0 +1,31 @@
+Slide 05
+
+Métodos de Instalação
+
+Minikube: Ferramenta que facilita a execução local do Kubernetes. O Minikube executa um cluster de Kubernetes de nó único, dentro de uma Máquina Virtual (VM) em seu laptop para usuários que queiram experimentar o Kubernetes ou desenvolvê-lo no dia-a-dia;
+Minishift: Ferramenta que ajuda você a executar o OKD localmente, iniciando um cluster OKD de nó único, dentro de uma máquina virtual. Com o Minishift, você pode experimentar o OKD ou desenvolvê-lo no dia a dia em sua máquina local;
+MicroK8s: Implementa Kubernetes a montante, certificada pela CNCF que é executada inteiramente na sua estação de trabalho. Sendo um snap, ele executa todos os serviços do Kubernetes de forma nativa (ou seja, sem máquinas virtuais), enquanto empacota todo o conjunto de bibliotecas e binários necessários;
+Ubuntu on LXD: O CDK é uma distribuição do Kubernetes empacotada como um pacote de charms para o Juju, o modelador de aplicativos de código aberto;
+Google Cloud, Azure e AWS: O Kubernetes lhe dá a oportunidade de substituir várias camadas de gerenciamento, monitoramento e segurança que você precisava para construir, integrar e manter-se com uma experiência engenhosa. Na verdade, existem alguns provedores de nuvem compatíveis com o Kubernetes, como exemplo: GKE do Google, Microsoft AKS e Amazon's EKS.
+
+
+Slide 07
+
+Google GKE
+
+Da mesma forma, você pode confiar que o GKE seja o mais atualizado. Muito mais testes de novos recursos e recursos do Kubernetes acontecem no GKE do que em outros provedores de nuvem. No GKE, você não precisa pagar pelo plano de controle do Kubernetes. O Google cobrirá você e você paga apenas pelos nós do trabalhador. Você também obtém o GCR (Goole Container Registry), o registro central integrado e o monitoramento, por meio do Stackdriver Logging e do Stackdriver Monitoring. Se você estiver interessado em uma integração ainda maior com o pipeline de IC / CD, poderá usar o Google Code Build.
+
+Slide 08
+
+Microsoft Azure AKS
+
+Um dos recursos mais interessantes do AKS, é o uso do projeto virtual-kublet para integração com o ACI (Azure Container Instances). A ACI elimina a necessidade de provisionar nós para o cluster, o que é uma grande dificuldade se você estiver lidando com uma carga altamente variável.
+
+
+Slide 09
+
+Amazon AWS EKS
+
+Quanto ao desempenho, o EKS está em algum lugar no meio. Leva de 10 a 15 minutos para iniciar um cluster. Obviamente, o desempenho de sistemas distribuídos complexos é muito diversificado e não pode ser capturado por uma única métrica. Dito isso, o EKS em si ainda é relativamente novo e pode levar algum tempo até que ele possa tirar total proveito da base robusta da AWS.
+
+

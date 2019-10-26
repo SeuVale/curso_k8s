@@ -1,0 +1,145 @@
+Slide 05
+
+Jobs
+
+Um caso simples, é criar um objeto Job para executar um Pod de forma confiável até a conclusão. O objeto Job iniciará um novo Pod, se o primeiro Pod falhar ou for excluído (por exemplo, devido a uma falha de hardware do nó ou a uma reinicialização do nó).
+
+Slide 06
+
+cat aula05/jobs/job1.yaml
+kubectl create -f aula05/jobs/job1.yaml
+
+kubectl get all -l app=job1
+
+kubectl get job
+kubectl describe job job1
+
+
+Política de falha de retirada do pod
+
+Há situações em que você deseja reprovar um Job, após alguma quantidade de tentativas, devido a um erro lógico na configuração, etc. Para fazer isso, defina .spec.backoffLimit para especificar o número de novas tentativas, antes de considerar um Job como com falha. O limite de recuo é definido por padrão como 6;
+Os pods com falha associados ao job, são recriados pelo controlador de tarefa com um atraso de recuo exponencial (10s, 20s, 40s…) limitado em seis minutos. A contagem de recuo será redefinida se nenhum novo Pods com falha aparecer, antes da próxima verificação de status do job.
+
+Slide 07
+
+pod=$(kubectl get pods --selector=job-name=job1 \
+--output=jsonpath='{.items[*].metadata.name}')
+kubectl logs $pod
+
+vim aula05/jobs/job1.yaml
+DE
+      restartPolicy: Never
+PARA
+      restartPolicy: OnFailure
+
+
+Terminação de trabalho e limpeza
+
+Por padrão, um Job será executado ininterruptamente, a menos que um Pod falhe (restartPolicy=Never) ou um Container saia em erro (restartPolicy=OnFailure), ponto no qual o Job adiará para o .backoffLimit.
+Se o seu Job tiver restartPolicy="OnFailure", lembre-se de que seu contêiner que está executando o Job, será encerrado assim que o limite de retirada do job for atingido. Isso pode dificultar a depuração do executável do Job.
+
+Slide 08
+
+kubectl delete -f aula05/jobs/job1.yaml
+kubectl apply -f aula05/jobs/job1.yaml
+
+kubectl get all -l app=job1
+kubectl describe job job1
+
+kubectl delete -f aula05/jobs/job1.yaml
+
+Contagem de conclusões fixas
+
+Quando você especifica conclusões com .spec.completions, cada Pod criado pelo controlador de tarefa tem uma especificação idêntica. Isso significa que todos os pods de uma tarefa terão a mesma linha de comando e a mesma imagem, os mesmos volumes e (quase) as mesmas variáveis de ambiente. 
+
+Slide 09
+
+cat aula05/jobs/job2.yaml
+
+kubectl get pods -l app=job2 -w
+kubectl create -f aula05/jobs/job2.yaml
+
+kubectl get pods -l app=job2
+kubectl describe job job2
+
+Slide 10
+
+kubectl get pods -l app=job2
+
+kubectl logs job2-<hash>
+
+kubectl delete -f aula05/jobs/job2.yaml
+
+Slide 11
+
+cat aula05/jobs/job3.yaml
+
+kubectl get pods -l app=job3 -w
+kubectl create -f aula05/jobs/job3.yaml
+
+kubectl get pods -l app=job3
+kubectl describe job job3
+
+
+Paralelismo de controle
+
+O paralelismo solicitado (parallelism) pode ser definido para qualquer valor não negativo. Se não for especificado, o padrão será 1. Se for especificado como 0, o trabalho será efetivamente pausado até que seja aumentado.
+
+O paralelismo real (número de conjuntos em execução, a qualquer instante) pode ser mais ou menos do que o paralelismo solicitado, por diversos motivos:
+
+Para tarefas fixas de contagem de conclusão, o número real de pods em execução e em paralelo, não excederá o número de conclusões restantes. Valores mais altos de paralelismo de .spec são efetivamente ignorados;
+Para trabalhos da fila de trabalho, nenhum novo Pod é iniciado após qualquer Pod ter sido bem-sucedido, no entanto, os Pods restantes podem ser concluídos;
+Se o controlador não teve tempo para reagir;
+Se o controlador não conseguiu criar Pods por qualquer motivo (falta de ResourceQuota, falta de permissão, etc.), então pode haver menos pods do que o solicitado;
+O controlador pode acelerar a criação do novo Pod, devido à falhas excessivas de pods anteriores no mesmo trabalho;
+Quando um Pod é encerrado, normalmente leva tempo para parar.
+
+Slide 12
+
+kubectl get pods -l app=job3
+
+kubectl logs job3-<hash>
+
+kubectl delete -f aula05/jobs/job3.yaml
+
+
+Slide 14
+
+Cronjobs
+
+Um cron job, cria um objeto de trabalho cerca de uma vez, por tempo de execução de sua programação.
+
+Para cada CronJob, o controlador CronJob verifica quantos cronogramas ele perdeu na duração, desde sua última hora agendada até agora. Se houver mais de 100 planejamentos perdidos, ele não iniciará o trabalho e registrará o erro.
+
+Slide 15
+
+cat aula05/jobs/job4.yaml
+kubectl create -f aula05/jobs/job4.yaml
+
+kubectl get cronjob
+kubectl describe cronjob job4
+
+kubectl get jobs --watch
+
+
+
+Scheduler
+
+O .spec.schedule é um campo obrigatório do spec. Ele usa uma string de formato Cron, como 0 * * * * ou @hourly, como o horário de agendamento de seus trabalhos a serem criados e executados;
+Os valores da etapa podem ser usados em conjunto com intervalos. Seguir um intervalo com / <number> especifica saltos do valor do número no intervalo. Por exemplo, 0-23 / 2 pode ser usado no campo de horas para especificar a execução do comando a cada duas horas (a alternativa no padrão V7 é 0,2,4,6,8,10,12,14,16,18, 20,22). Etapas também são permitidas após um asterisco, então se você quiser dizer “a cada duas horas”, basta usar * / 2.
+
+
+Slide 16
+
+kubectl get cronjob job4
+
+kubectl get pods
+kubectl logs job4-<HASH>
+
+kubectl delete -f aula05/jobs/job4.yaml
+
+
+
+
+
+

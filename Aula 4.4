@@ -1,0 +1,40 @@
+Slide 05
+
+Cota de recursos de computação
+
+Você pode limitar a soma total de recursos de computação que podem ser solicitados em um determinado namespace.
+
+Os seguintes tipos de recursos são suportados:
+
+limits.cpu: Em todos os pods em um estado não terminal, a soma dos limites de CPU não pode exceder esse valor;
+limits.memory: Em todos os pods em um estado não terminal, a soma dos limites de memória não pode exceder esse valor;
+requests.cpu: Em todos os pods em um estado não terminal, a soma das solicitações de CPU não pode exceder esse valor;
+requests.memory: Em todos os pods em um estado não terminal, a soma de solicitações de memória não pode exceder esse valor.
+
+Slide 06
+
+cat aula04/limits/dexter-limit-range-3.yaml
+kubectl create -f aula04/limits/dexter-limit-range-3.yaml
+
+kubectl describe resourcequota -n dexter-limits
+
+cat aula04/limits/limited-pod6.yaml 
+kubectl create -f aula04/limits/limited-pod6.yaml
+
+Slide 07
+
+kubectl describe resourcequota -n dexter-limits
+
+cat aula04/limits/limited-pod7.yaml 
+kubectl create -f aula04/limits/limited-pod7.yaml
+
+Slide 08
+
+kubectl delete -f aula04/limits/limited-pod6.yaml
+kubectl delete -f aula04/limits/limited-pod7.yaml
+kubectl delete -f aula04/limits/dexter-limit-range-3.yaml
+
+
+
+
+

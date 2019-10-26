@@ -1,0 +1,68 @@
+Slide 06
+
+Funcionamento do Liveness
+
+No exemplo apresentado, o aplicativo está com problema e o Pod é reiniciado, fazendo com que ele seja interrompido indefinidamente e pare de atender solicitações. Como o processo continua a ser executado, por padrão, o Kubernetes acha que está tudo bem e continua a enviar solicitações para o pod quebrado. Ao usar o Liveness, o Kubernetes detecta que o aplicativo não está mais atendendo solicitações e reinicia o pod ofensivo.
+
+Slide 07
+
+cat aula08/liveness/liveness-exec.yaml
+kubectl create -f aula08/liveness/liveness-exec.yaml
+
+kubectl get pods -l test=liveness
+
+kubectl get events | grep liveness-exec
+
+Descrição das opções
+
+No arquivo de configuração, você pode ver que o Pod tem um único contêiner. O campo periodSeconds especifica que o kubelet deve executar uma sonda de atividade a cada 5 segundos. O campo initialDelaySeconds diz ao kubelet que ele deve esperar 5 segundos, antes de realizar o primeiro teste;
+Para realizar uma sonda, o kubelet executa o comando cat /tmp/healthy no Container. Se o comando tiver êxito, ele retornará 0 e o kubelet considerará o Container como ativo e saudável. Se o comando retornar um valor diferente de zero, o kubelet mata o Container e o reinicia.
+
+Slide 08
+
+cat aula08/liveness/liveness-http.yaml
+kubectl create -f aula08/liveness/liveness-http.yaml
+
+kubectl get pods -l test=liveness
+kubectl get events | grep liveness-http
+
+kubectl delete -f aula08/liveness
+
+Descrição das opções
+
+No arquivo de configuração, você pode ver que o Pod tem um único contêiner. O campo periodSeconds especifica que o kubelet deve executar uma sonda de atividade a cada 3 segundos. O campo initialDelaySeconds diz ao kubelet que ele deve aguardar 3 segundos, antes de realizar o primeiro teste;
+Para executar uma análise, o kubelet envia uma solicitação HTTP GET para o servidor que está sendo executado no Container e escuta na porta 8080. Se o manipulador do caminho / healthz do servidor retornar um código de sucesso, o kubelet considera o Contêiner como ativo e saudável. Se o manipulador retornar um código de falha, o kubelet mata o Container e o reinicia;
+Qualquer código maior ou igual a 200 e menor que 400, indica sucesso. Qualquer outro código indica falha.
+
+Slide 11
+
+Funcionamento do Readiness (Prontidão) rédines
+
+No exemplo apresentado o aplicativo levará um minuto para se aquecer e começar. Seu serviço não funcionará até que esteja em funcionamento, mesmo que o processo tenha iniciado. Você também terá problemas se quiser ampliar essa implantação para ter várias cópias. 
+Uma nova cópia não deve receber tráfego até que esteja totalmente pronta, mas, por padrão, o Kubernetes começa a enviar tráfego assim que o processo dentro do contêiner é iniciado. Ao usar um probe de prontidão, o Kubernetes aguarda até que o aplicativo seja totalmente iniciado antes de permitir que o serviço envie tráfego para a nova cópia.
+
+Slide 12
+
+cat aula08/readiness/readiness-exec.yaml
+kubectl create -f aula08/readiness/readiness-exec.yaml
+
+kubectl get pods -l test=readiness
+
+kubectl get events | grep readiness-exec
+
+Slide 13
+
+cat aula08/readiness/readiness-http.yaml
+kubectl create -f aula08/readiness/readiness-http.yaml
+
+kubectl get pods -l test=readiness
+kubectl get events | grep readiness-http
+
+kubectl delete -f aula08/readiness
+
+
+
+
+
+
+

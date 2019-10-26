@@ -1,0 +1,149 @@
+Slide 05
+
+Helm
+
+A maioria das linguagens de programação e sistemas operacionais, têm seu próprio gerenciador de pacotes para ajudar na instalação e manutenção de software. O Helm fornece o mesmo conjunto de recursos básicos, que muitos dos gerenciadores de pacotes com os quais você já está familiarizado, como o apt do Debian ou o pip do Python.
+
+Recursos:
+Instalar software;
+Instalar automaticamente dependências de software;
+Atualizar o software;
+Configurar implantações de software;
+Buscar pacotes de software dos repositórios.
+
+O Helm fornece essa funcionalidade, por meio dos seguintes componentes:
+Uma ferramenta de linha de comando, helm, que fornece a interface do usuário para toda a funcionalidade do Helm;
+Um componente de servidor complementar, tiller, que é executado em seu cluster do Kubernetes, ouve comandos do leme e manipula a configuração e a implantação de versões de software no cluster;
+O formato de empacotamento do Helm, chamado de gráficos;
+Um repositório de gráficos com curadoria oficial com gráficos pré-empacotados para projetos populares de software de código aberto.
+
+Slide 06
+
+sudo snap install helm --classic
+
+helm --help
+
+helm init
+
+kubectl get pod -n kube-system | grep tiller
+
+
+Configuração inicial do Helm
+
+O comando helm init instala o Tiller (o componente do lado do servidor Helm) no seu Kubernetes Cluster e configura a configuração local em $HELM_HOME (default ~ /.helm /);
+
+Como no resto dos comandos Helm, o 'helm init' descobre os clusters do Kubernetes, lendo $KUBECONFIG (padrão '~ /.kube/config') e usando o contexto padrão;
+
+Ao instalar o Tiller, o 'helm init' tentará instalar a última versão lançada. Você pode especificar uma imagem alternativa com '--tiller-image'. 
+
+Slide 07
+
+kubectl create serviceaccount --namespace kube-system tiller
+
+kubectl create clusterrolebinding tiller-cluster-rule \
+--clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+
+kubectl patch deploy --namespace kube-system tiller-deploy \
+-p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+
+Uso de RBAC no Cluster
+
+O controle de acesso baseado em função (RBAC), é um método de regular o acesso a recursos de computador ou de rede, com base nas funções de usuários individuais em uma empresa.
+
+No exemplo apresentado, estamos concedendo permissões completas do ServiceAccount RBAC para gerenciar o cluster.
+
+O assunto RBAC será abordado com mais detalhes na aula Kubernetes Security.
+
+
+Slide 09
+
+helm search ingress
+
+helm install stable/nginx-ingress --name nginx-ingress \
+ --namespace kube-system
+
+kubectl get pod,deployment,svc,secret,configmap,sa,role,\
+rolebinding -n kube-system | grep ingress
+kubectl get role,rolebinding -n kube-system | grep ingress
+
+
+nginx-ingress
+
+O nginx-ingress é um aplicativo que é executado em um cluster e configura um balanceador de carga HTTP de acordo com os recursos do Ingress. No caso do NGINX, o controlador do Ingress é implantado em um pod, junto com o balanceador de carga.
+
+No exemplo apresentado, listamos secrets, configmap, serviceaccount role e rolebinding.
+
+Estes assuntos serão abordados com mais detalhes nas aulas Gerenciar do ciclo de vida da aplicação e Kubernetes Security.
+
+Slide 10
+
+kubectl describe configmap ingress-controller-leader-nginx \
+-n kube-system
+
+cat aula03/install-ingress/nginx-ingress-config.yaml
+kubectl apply -f aula03/install-ingress/nginx-ingress-config.yaml
+
+kubectl describe configmap ingress-controller-leader-nginx \
+-n kube-system
+
+
+
+use-proxy-protocol
+
+No exemplo apresentado, estamos ativando o protocolo de proxy. Neste modo, o NGINX não usa o conteúdo do cabeçalho para obter o endereço IP de origem da conexão.
+
+Slide 11
+
+kubectl describe service nginx-ingress-controller -n kube-system
+
+cat aula03/install-ingress/nginx-ingress-nodeport.yaml
+kubectl apply -f aula03/install-ingress/nginx-ingress-nodeport.yaml
+
+kubectl describe service nginx-ingress-controller -n kube-system
+
+
+
+
+
+Nginx-ingress e HaProxy
+
+Em nosso exemplo, estamos redirecionando o acesso a porta 80 para 31080, e a porta 443 para 31443. As portas 31080 e 31443 estão configurados em uma máquina com o HAProxy já instalado e configurado.
+
+Slide 13
+
+
+sudo cat /etc/haproxy/haproxy.cfg
+
+
+HAProxy
+
+O HAProxy é um software livre e de código aberto, que fornece um balanceador de carga de alta disponibilidade e um servidor proxy para aplicativos baseados em TCP e HTTP, que distribui solicitações em vários servidores.
+
+Você pode configurar o HAProxy com um ou mais endereços IP públicos, e fazer com que ele balance o tráfego entre seu pool de nós. Em nosso curso, a máquina Balancer possui o IP 200.100.50.200.
+
+Descrição das opções
+
+frontend: Permite expor um site à Internet/Intranet para a porta 443;
+bind: Permite que o serviço ouça a um determinado endereço IP e porta;
+mode: Define se o HAProxy opera como um proxy TCP simples ou se é capaz de inspecionar as mensagens HTTP de nível superior do tráfego de entrada;
+option tcplog: Ativa o log avançado de conexões TCP com estado de sessão e temporizadores;
+timeout client: Define o tempo máximo de inatividade no lado do cliente;
+default_backend: Especifica o back-end a ser usado, quando nenhuma regra "use_backend" tiver sido correspondida.  
+
+Slide 14
+
+Descrição das opções
+
+backend: Define em qual backend as configurações serão aplicadas;
+mode: Define o modo de trabalho do HAProxy;
+option tcplog: Ativa o log avançado de conexões TCP, com estado de sessão e temporizadores;
+option log-health-checks: Ativa ou desativa o registro de atualizações de status de verificações de integridade;
+option redispatch: Ativa ou desativa a redistribuição de sessão em caso de falha de conexão;
+log global: Ativa o registro por instância de eventos e tráfego;
+balance: Define o algoritmo de balanceamento de carga a ser usado em um back-end;
+timeout connect: Define o tempo máximo para aguardar uma tentativa de conexão para que um servidor seja bem-sucedido;
+timeout server: Define o tempo máximo de inatividade no lado do servidor;
+server: Define o nome ou ip do servidor e sua porta que receberá o trafego.
+
+
+

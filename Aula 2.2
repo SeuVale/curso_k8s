@@ -1,0 +1,65 @@
+
+################### Instalação do Docker
+
+sudo apt-get install apt-transport-https ca-certificates \
+    curl gnupg-agent software-properties-common -y
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo \
+apt-key add -
+
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) stable"
+
+sudo apt-get update
+
+sudo apt-get install docker-ce=18.06.1~ce~3-0~ubuntu -y
+sudo usermod -aG docker suporte
+
+################### Instalação do Kubernetes
+
+
+01 - Selecione a VM clique em Configurações -> Sistema -> Processador -> 2 CPUs
+
+02 - Desativar SWAP
+sudo vim /etc/fstab 
+....
+#/dev/mapper/centos-swap swap                    swap    defaults        0 0
+
+sudo swapoff -a
+sudo swapon -s
+
+
+Slide 12
+
+Por que desativar o Swap?
+
+O Kubernetes é um sistema distribuído, projetado para operar em escala. Ao executar um grande número de contêineres em uma vasta frota de máquinas, você deseja previsibilidade e consistência. Desativar o swap é a abordagem correta. É melhor matar um único contêiner do que vários contêineres em uma máquina numa taxa imprevisível, provavelmente lenta.
+Portanto, o kubelet não foi projetado para lidar com situações de troca. Espera-se que a demanda por carga de trabalho se encaixe na memória do host.
+
+
+03 - Configurar repositorio
+
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
+ sudo apt-key add -
+
+cat << EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+sudo apt-get update
+
+sudo apt install -y kubelet=1.14.3-00 kubeadm=1.14.3-00 \
+ kubectl=1.14.3-00
+
+sudo kubeadm version
+
+
+Slide 14
+
+
+Versão do Kubernetes
+
+Em nossa infraestrutura não estamos instalando a versão mais atual do Kubernetes. Isso é proposital, a fim de criar um ambiente que será atualizado futuramente.
+
+

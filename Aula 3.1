@@ -1,0 +1,94 @@
+Slide 04
+
+Kubernetes Network
+
+A rede do Kubernetes é baseada em várias camadas, todas atendendo a esse propósito final:
+Comunicação de contêiner para contêiner usando localhost e o namespace de rede do Pod. Esse nível de rede ativa as interfaces de rede do contêiner para contêineres fortemente acoplados, que podem se comunicar entre si em portas especificadas, da mesma forma que os aplicativos convencionais se comunicam via host local;
+Comunicação de pod-para-pod que permite a comunicação de pods, através de nós;
+Serviços. Uma abstração de Serviço define uma política (microsserviço) para acessar os Pods por outros aplicativos.
+
+
+Slide 05
+
+Regras de rede
+
+A plataforma Kubernetes define as seguintes regras de rede:
+Todos os contêineres devem se comunicar uns com os outros, sem NAT;
+Todos os nós devem se comunicar com todos os contêineres, sem NAT;
+O IP visto por um contêiner é o mesmo visto pelo outro contêiner (em outras palavras, o Kubernetes barra qualquer máscara de IP);
+Os pods podem se comunicar, independentemente do nó em que eles se sentam.
+
+Slide 06
+
+Docker Network
+
+O modelo de rede privada do Docker, baseia-se em um espaço de endereço IP privado que pode ser usado livremente por qualquer pessoa sem a aprovação do registro da Internet, mas que deve ser traduzido usando NAT ou servidor proxy, se a rede precisar se conectar à Internet. Uma rede privada do host é uma rede privada que vive em um host em oposição a uma rede privada de vários hosts que abrange vários hosts.
+
+Slide 07
+
+Docker Network
+
+O que o driver de ponte do Docker implementa?
+
+O Docker cria uma ponte virtual (docker0) e aloca uma sub-rede de um dos blocos de endereços privados dessa ponte. Uma ponte de rede é um dispositivo que cria uma única rede mesclada, a partir de várias redes ou segmentos de rede. Da mesma forma, uma ponte virtual é uma analogia de uma ponte de rede física usada na rede virtual. As pontes de rede virtual, como o docker0, permitem conectar máquinas virtuais (VMs) ou contêineres em uma única rede virtual; 
+Para conectar os contêineres à rede virtual, o Docker aloca um dispositivo de ethernet virtual chamado veth anexado à ponte. Similarmente a uma bridge virtual, veth é uma analogia virtual da tecnologia ethernet, usada para conectar hosts a LAN ou Internet ou pacotes, e para passar dados usando uma ampla variedade de protocolos;
+O veth é mapeado para a interface de rede eth0, que é a interface Ethernet do Linux que gerencia o dispositivo Ethernet e a conexão entre o host e a rede. No Docker, cada eth0 no container é fornecido com um endereço IP do intervalo de endereços da ponte. Dessa forma, cada contêiner recebe seu próprio endereço IP desse intervalo.
+
+
+Slide 09
+
+Kubernetes Network
+
+O Kubernetes ignora a limitação do Docker Network, fornecendo uma interface de rede compartilhada para contêineres. Usando a analogia do modelo Docker, o Kubernetes permite que os contêineres compartilhem uma única interface veth, como na imagem acima.
+
+Como resultado, o modelo do Kubernetes aumenta a abordagem de rede privada do host padrão da seguinte maneira:
+
+Permite que ambos os contêineres sejam endereçáveis em veth0 (por exemplo, 172.17.0.2 na imagem acima);
+Permite que os contêineres acessem uns aos outros, por meio de portas alocadas no host local;
+Praticamente falando, isso é o mesmo que executar aplicativos em um host com benefícios adicionais de isolamento de contêiner e design de arquiteturas de contêineres fortemente acoplados.
+
+
+Slide 11
+
+Container-to-container networking
+
+Um Pod é modelado como um grupo de contêineres individuais do Docker, todos compartilhando um namespace de rede. Todos os contêineres de um determinado Serviço terão o mesmo endereço IP e espaço de porta, atribuídos pelo namespace de rede e ao Pod;
+Como todos os contêineres residem no mesmo namespace, eles podem se comunicar entre si via host local.
+
+
+Slide 12
+
+Pod-to-Pod networking
+
+Cada Pod no Kubernetes tem um endereço IP atribuído, e esse endereço IP é aquele que os outros Pods verão. No entendimento de como os pods se comunicam entre si por meio de endereços IP reais, consideremos dois pods que residem na mesma máquina física e, portanto, compartilhe um nó;
+No que diz respeito a cada Pod, ele existe em seu próprio namespace Ethernet. Esse namespace precisa se comunicar com outros namespaces de rede, localizados no mesmo nó. O Linux fornece um mecanismo para conectar namespaces usando um dispositivo Ethernet virtual (VED ou 'par veth'). O VED é composto por um par de interfaces virtuais. Para conectar dois namespaces do Pod, um lado do VED é atribuído ao namespace da rede raiz. O outro membro do par veth é então atribuído ao namespace da rede do Pod;
+O VED funciona como um cabo virtual que conecta o namespace da rede raiz ao do namespace da rede do Pod e permite que eles troquem dados.
+
+
+Slide 13
+
+Pod-to-Service networking
+
+Os endereços IP do pod no Kubernetes não são duráveis. Sempre que um aplicativo é ampliado ou reduzido, ou encontra um erro e precisa ser reinicializado, seu endereço IP desaparecerá e precisará ser retribuído. Essa alteração no endereço IP ocorre sem aviso. Em resposta a isso, o Kubernetes utiliza serviços;
+No Kubernetes, um Serviço gerencia o estado atual de um conjunto de Pods. Isso fornece ao usuário um meio de rastrear endereços IP e outras propriedades que mudam com o tempo;
+Os serviços servem como uma camada de abstração sobre os Pods, atribuindo um único endereço IP virtual a um grupo específico de pods. Depois que esses pods estiverem associados a esse endereço IP virtual, qualquer tráfego endereçado a esse IP virtual será roteado para o conjunto correspondente de pods;
+O conjunto de pods vinculados a um serviço pode ser alterado a qualquer momento, mas o endereço IP do serviço permanecerá estático.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

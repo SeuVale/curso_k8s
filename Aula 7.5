@@ -1,0 +1,103 @@
+Slide 05
+
+cat aula07/security-context/pod-readonly.yaml 
+kubectl create -f aula07/security-context/pod-readonly.yaml
+
+kubectl get pods pod-readonly
+kubectl exec -it pod-readonly touch /novoarquivo
+
+kubectl exec -it pod-readonly touch /backup/novoarquivo
+kubectl exec -it pod-readonly ls /backup
+
+
+Descrições das opções
+
+readOnlyRootFilesystem: Definido como true, permite somente leitura à raiz do sistema de arquivos no container;
+readOnly: Definido como false, permite leitura e escrita em um ponto de montagem do volume no container.
+.
+
+Slide 06
+
+kubectl run pod-security-default --generator=run-pod/v1 \
+--image=alpine --restart Never -- /bin/sleep 999999
+
+kubectl exec -it pod-security-default -- date +%T -s "23:30:00"
+kubectl exec pod-security-default date
+
+kubectl exec -it pod-security-default -- chown guest /tmp
+kubectl exec -it pod-security-default -- ls -ld /tmp
+
+
+Slide 07
+
+cat aula07/security-context/pod-capabilities.yaml 
+kubectl create -f aula07/security-context/pod-capabilities.yaml
+
+kubectl exec -it pod-capabilities -- date +%T -s "23:30:00"
+kubectl exec pod-capabilities date
+
+kubectl exec -it pod-capabilities -- chown guest /tmp
+
+
+Descrições das opções
+
+capabilities: Os recursos do Linux fornecem um detalhamento dos privilégios, tradicionalmente associados ao superusuário. Alguns desses recursos podem ser usados para escalonar privilégios ou para fuga de contêineres, e podem ser restringidos pelo PodSecurityPolicy;
+NET_ADMIN: Permite o uso de soquetes RAW, o uso de soquetes PACKET e ligação a qualquer endereço para proxy transparente;
+SYS_TIME: Permite configuração de dispositivos tty e vhangup de tty.
+.
+
+Slide 09
+
+kubectl exec pod-security-default id | grep root
+
+cat aula07/security-context/pod-user-group-context.yaml 
+kubectl create -f aula07/security-context/pod-user-group-context.yaml
+
+kubectl get pods | grep pod
+kubectl exec pod-user-group-context id
+
+
+
+Descrições das opções
+
+runAsUser: Especifica que para qualquer Containers no Pod, todos os processos são executados com o ID do usuário 1000;
+runAsGroup: Especifica o ID do grupo primário de 3000 para todos os processos, em qualquer contêiner do Pod.
+.
+
+Slide 10
+
+cat aula07/security-context/pod-nonroot.yaml 
+kubectl create -f aula07/security-context/pod-nonroot.yaml
+
+kubectl get pods | grep pod
+
+kubectl exec pod-nonroot-context id
+
+
+
+runAsNonRoot: Exige uma diretiva USER numérica, diferente de zero no contêiner.
+
+
+Slide 12
+
+cat aula07/security-context/pod-group-context.yaml 
+kubectl apply -f aula07/security-context/pod-group-context.yaml
+
+kubectl get pods | grep pod
+
+kubectl exec -it pod-group-context -- ps
+kubectl exec -it pod-group-context -- id
+
+fsGroup: Controla o grupo suplementar, aplicado a alguns volumes.
+
+Slide 13
+
+kubectl exec -it pod-group-context -- ls -l /backup
+kubectl exec -it pod-group-context -- touch /backup/servers/linux
+kubectl exec -it pod-group-context -- ls -l /backup/servers
+
+kubectl delete pod pod-security-default
+kubectl delete -f aula07/security-context/
+
+
+

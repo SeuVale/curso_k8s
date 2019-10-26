@@ -1,0 +1,53 @@
+Slide 05
+
+cat aula08/dashboard/heapster.yaml
+kubectl create -f aula08/dashboard/heapster.yaml
+
+cat aula08/dashboard/influxdb.yaml
+kubectl create -f aula08/dashboard/influxdb.yaml
+
+cat aula08/dashboard/heapster-rbac.yaml
+kubectl create -f aula08/dashboard/heapster-rbac.yaml
+
+Heapster
+
+O Heapster permite o Monitoramento de Cluster de Contêiner e a Análise de Desempenho para o Kubernetes (versões v1.0.6 e posteriores) e plataformas que o incluem. Heapster coleta e interpreta vários sinais, como uso de recursos de computação, eventos de ciclo de vida, etc. 
+
+InfluxDB
+
+O InfluxDB é uma plataforma de série temporal de software livre. Isso inclui APIs para armazenamento e consulta de dados, processamento em segundo plano para fins de ETL ou de monitoramento e alerta, painéis do usuário, visualização e exploração dos dados e muito mais.
+
+
+
+Slide 06
+
+cat aula08/dashboard/kubernetes-dashboard.yaml
+kubectl create -f aula08/dashboard/kubernetes-dashboard.yaml
+
+cat aula08/dashboard/admin-user.yaml
+kubectl create -f aula08/dashboard/admin-user.yaml
+
+kubectl get pods -l k8s-app=kubernetes-dashboard -n kube-system
+
+Slide 07
+
+kubectl get service kubernetes-dashboard -n kube-system
+
+kubectl edit service kubernetes-dashboard -n kube-system
+ALTERAR:
+  type: ClusterIP
+PARA:
+  type: NodePort
+
+
+Slide 08
+
+kubectl get service kubernetes-dashboard -n kube-system
+
+kubectl -n kube-system describe secret $(kubectl -n kube-system \
+get secret | grep admin-user | awk '{print $1}')
+
+
+https://200.100.50.100:32452
+
+

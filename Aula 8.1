@@ -1,0 +1,38 @@
+Slide 05
+
+cat aula08/logs/mysql-deploy.yaml
+kubectl apply -f aula08/logs/mysql-deploy.yaml
+
+kubectl logs --help
+
+kubectl logs deployment/mysql
+kubectl logs -f -l app=mysql --all-containers=true
+
+Slide 06
+
+POD=$(kubectl get pod | grep mysql | awk -F" " '{print $1}')
+kubectl logs $POD
+kubectl logs --tail=10 $POD
+kubectl logs --since=1h $POD
+
+Slide 08
+
+sudo su - 
+cd /var/log/containers/
+
+cat calico-node<TAB>
+cat coredns-<TAB>
+
+cat etcd-kube-master.dexter.com.br_kube-system<TAB>
+cat kube-proxy-<TAB>
+
+cat kube-apiserver-kube-master.<TAB>
+cat kube-controller-manager-kube-master.<TAB>
+
+cat kube-scheduler-kube-master.<TAB>
+
+exit
+kubectl delete -f aula08/logs/mysql-deploy.yaml
+
+
+

@@ -1,0 +1,78 @@
+Slide 05
+
+cat aula06/pod/pod1.yaml
+kubectl create -f aula06/pod/pod1.yaml
+
+kubectl get pod pod1
+
+kubectl exec -it pod1 -- df -Th
+kubectl exec -it pod1 -- ls /backup
+
+
+Descrição das opções
+
+volumeMounts: Define as opções de montagem;
+mountPath: Define a localização do volume no sistema de arquivo no Pod;
+emptyDir: Um volume emptyDir é criado primeiro quando um Pod é atribuído a um Nó, e existe desde que esse Pod esteja em execução nesse nó. Como o nome diz, inicialmente está vazio.
+
+Por padrão, os volumes emptyDir são armazenados em qualquer mídia que esteja apoiando o nó - que pode ser disco, SSD ou armazenamento em rede, dependendo do ambiente. No entanto, você pode definir o campo emptyDir.medium como "Memory" para dizer ao Kubernetes para montar um tmpfs (sistema de arquivos com suporte de RAM) para você. 
+Embora o tmpfs seja muito rápido, lembre-se de que, diferentemente dos discos, o tmpfs é limpo na reinicialização do nó e todos os arquivos que você escreve contam como o limite de memória do contêiner. 
+
+Slide 06
+
+kubectl exec -it pod1 -- cp /etc/fstab /backup
+kubectl exec -it pod1 -- ls /backup
+
+kubectl get pod pod1 -o yaml | grep uid
+
+
+Slide 07
+
+sudo su -
+
+cd /var/lib/kubelet/pods/<HASH>/volumes/kubernetes.io~empty-dir/
+
+ls backup-volume
+cp /etc/hosts backup-volume/
+ls backup-volume
+
+Slide 08
+
+kubectl exec -it pod1 -- df -Th
+kubectl exec -it pod1 -- ls /backup
+
+kubectl delete -f aula06/pod/pod1.yaml
+
+Slide 10
+
+cat aula06/pod/pod2.yaml
+ssh kube-node02 mkdir data
+kubectl create -f aula06/pod/pod2.yaml
+kubectl get pod pod2
+
+
+Descrição das opções
+
+hostPath: Um volume hostPath, monta um arquivo ou diretório do sistema de arquivos do nó do host no seu Pod. Isso não é algo que a maioria dos Pods necessitará, mas oferece um poderoso escape para alguns aplicativos;
+path: Define o caminho que o volume vai armazenar os arquivos fisicamente no Node;
+type: Define o tipo de objeto utilizado no volume. No exemplo apresentado, estamos usando Directory.
+
+Tipos de volume
+
+Pods com configuração idêntica (como criados a partir de um podTemplate) podem se comportar de maneira diferente em nós diferentes, devido a arquivos diferentes nos nós;
+Quando o Kubernetes adiciona agendamento com reconhecimento de recursos, conforme planejado, ele não poderá contabilizar os recursos usados por um hostPath;
+Os arquivos ou diretórios criados nos hosts subjacentes só podem ser gravados pelo root. Você precisa executar seu processo como root em um Container privilegiado ou modificar as permissões de arquivo no host para poder gravar em um volume hostPath.
+
+Slide 11
+
+kubectl exec -it pod2 -- df -Th
+kubectl exec -it pod2 -- ls /backup
+
+scp /etc/hostname kube-node02:data
+kubectl exec -it pod2 -- cat /backup/hostname
+
+kubectl delete -f aula06/pod/pod2.yaml
+
+
+
+

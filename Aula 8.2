@@ -1,0 +1,67 @@
+Slide 05
+
+sudo apt install git -y
+
+git clone \
+https://github.com/kubernetes-incubator/metrics-server.git
+
+ls metrics-server/deploy/1.8+/
+
+
+Slide 06
+
+cat aula08/metrics-server-deployment.yaml
+cp aula08/metrics-server-deployment.yaml metrics-server/deploy/1.8+/
+
+kubectl apply -f metrics-server/deploy/1.8+/
+kubectl get pods -l k8s-app=metrics-server -n kube-system
+kubectl get --raw /apis/metrics.k8s.io/
+
+Ajuste no manifesto YAML
+
+No exemplo apresentado foi adicionado ao arquivo metrics-server-deployment.yaml o seguinte conteúdo:
+
+        command:
+        - /metrics-server
+        - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+        - --kubelet-insecure-tls
+
+Descrição das opções:
+
+--kubelet-preferred-address-types: Faz com que os logs do kubectl e outras comunicações do kubelet com o servidor da API, funcionem em ambientes em que os nomes dos hosts dos nós não podem ser resolvidos;
+--kubelet-insecure-tls: Se você for usar o InternalIP, provavelmente deverá configurar os certificados de serviço do seu nó para listar o IP como um nome alternativo. Utilize kubelet-insecure-tlsapenas em configurações de teste.
+
+
+Slide 08
+
+kubectl top node
+kubectl top pod
+kubectl top pod --all-namespaces
+kubectl top pod -n kube-system
+
+
+Descrição dos comando
+
+kubectl top node: Exibe o uso do recurso de exibição (CPU/memória/armazenamento) dos nós;
+kubectl top pod: Exibe o uso do recurso de exibição (CPU/memória/armazenamento) dos pods.
+
+
+Slide 09
+
+kubectl create -f aula08/logs/mysql-deploy.yaml
+kubectl top pod -l app=mysql
+
+POD=$(kubectl get pod | grep mysql | awk -F" " '{print $1}')
+kubectl top pod $POD --containers
+
+kubectl delete -f aula08/logs/mysql-deploy.yaml
+
+
+
+
+
+
+
+
+
+

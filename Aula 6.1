@@ -1,0 +1,52 @@
+Slide 04
+
+Docker Volume x Kubernetes Volume
+
+O Docker possui um conceito de volumes, embora seja um pouco mais flexível e menos gerenciado. No Docker, um volume é simplesmente um diretório no disco ou outro Container. Os tempos de vida não são gerenciados e até muito recentemente existiam apenas volumes baseados em disco local. O Docker agora fornece drivers de volume, mas a funcionalidade é muito limitada por enquanto (por exemplo, a partir do Docker 1.7, somente um driver de volume é permitido por contêiner e não há como passar parâmetros para volumes).
+
+Slide 05
+
+Kubernetes Volume
+
+Um volume do Kubernetes tem uma vida útil explícita - o mesmo que o Pod que o contém. Consequentemente, um volume ultrapassa todos os Containers que são executados no Pod e os dados são preservados nas reinicializações do Container. Naturalmente, quando um Pod deixa de existir, o volume deixará de existir também. Talvez mais importante que isso, o Kubernetes suporta muitos tipos de volumes, e um Pod pode usar qualquer número deles simultaneamente.
+
+Slide 06
+
+Volumes baseados em Host
+
+emptyDir
+
+Um volume emptyDir é criado primeiro quando um Pod é atribuído a um Nó, e existe desde que esse Pod esteja em execução nesse nó. Como o nome diz, inicialmente está vazio;
+Os contêineres no Pod podem ler e gravar os mesmos arquivos no volume emptyDir, embora esse volume possa ser montado nos mesmos ou em diferentes caminhos em cada Container. Quando um Pod é removido de um nó por qualquer motivo, os dados no diretório vazio são excluídos permanentemente.
+
+hostPath
+
+Um volume hostPath monta um arquivo ou diretório do sistema de arquivos do nó do host no seu Pod. Isso não é algo que a maioria dos Pods necessitará, mas oferece um poderoso escape para alguns aplicativos.
+
+Slide 07
+
+Volumes em armazenamento em bloco
+
+Exemplos de armazenamento em bloco:
+
+gcePersistentDisk: Um volume gcePersistentDisk monta um disco permanente do Google Compute Engine (GCE) no seu pod. Ao contrário do emptyDir, que é apagado quando um Pod é removido, o conteúdo de um POD é preservado e o volume é simplesmente desmontado. Isso significa que um POD pode ser pré-preenchido com dados e que os dados podem ser "entregues" entre os pods;
+vsphereVolume: Um vsphereVolume é usado para montar um volume VMDK do vSphere em seu pod. O conteúdo de um volume é preservado quando é desmontado. Suporta o armazenamento de dados VMFS e VSAN.
+
+Para conhecer outros tipos de volumes de armazenamento em bloco, acesse o seguinte endereço:
+https://kubernetes.io/docs/concepts/storage/volumes/#types-of-volumes
+
+
+Slide 08
+
+Volumes em sistema de arquivos distribuído
+
+Exemplos de sistemas de arquivos distribuído:
+
+cephfs: Um volume cephfs permite que um volume existente do CephFS seja montado em seu Pod. Ao contrário do emptyDir, que é apagado quando um Pod é removido, o conteúdo de um volume do cephfs é preservado e o volume é simplesmente desmontado. Isso significa que um volume do CephFS pode ser pré-preenchido com dados e que os dados podem ser “entregues” entre os Pods. O CephFS pode ser montado por vários escritores simultaneamente;
+nfs: Um volume nfs permite que um compartilhamento NFS (Network File System) existente seja montado em seu Pod. Ao contrário do emptyDir, que é apagado quando um Pod é removido, o conteúdo de um volume nfs é preservado e o volume é simplesmente desmontado. Isso significa que um volume NFS pode ser pré-preenchido com dados e que os dados podem ser "entregues" entre os Pods. O NFS pode ser montado por vários escritores simultaneamente.
+
+Para conhecer outros tipos de volumes de armazenamento em bloco, acesse o seguinte endereço:
+https://kubernetes.io/docs/concepts/storage/volumes/#types-of-volumes
+
+
+

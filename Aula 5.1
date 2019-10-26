@@ -1,0 +1,72 @@
+Slide 06
+
+cat aula05/deploy/nginx-deploy.yaml
+kubectl create -f aula05/deploy/nginx-deploy.yaml
+kubectl describe deployment nginx-deploy
+kubectl get pods -l app=nginx -o wide
+
+
+Slide 07
+
+kubectl expose deployment nginx-deploy --port 80 --target-port 80
+
+APP=$(kubectl get services | grep nginx-deploy \
+| awk -F" " '{print $3}')
+curl $APP
+kubectl rollout status deployment nginx-deploy
+
+Slide 08
+
+kubectl set image deployment/nginx-deploy nginx=httpd --record
+curl $APP
+kubectl rollout undo deployment nginx-deploy
+kubectl get pods -l app=nginx -o wide
+
+Slide 09
+
+vim aula05/deploy/nginx-deploy.yaml
+....
+DE
+        image: nginx
+PARA
+        image: httpd
+
+kubectl apply -f aula05/deploy/nginx-deploy.yaml --record
+
+Slide 10
+
+kubectl get pods -l app=nginx -o wide
+curl $APP
+
+kubectl rollout history deployment nginx-deploy
+kubectl rollout history deployment nginx-deploy --revision=4
+
+kubectl rollout undo deployment nginx-deploy --to-revision=4
+
+Slide 11
+
+kubectl rollout history deployment nginx-deploy
+vim aula05/deploy/nginx-deploy.yaml
+....
+DE
+  replicas: 2
+PARA
+  replicas: 3
+
+kubectl apply -f aula05/deploy/nginx-deploy.yaml --record
+
+Slide 12
+
+kubectl rollout pause deployment nginx-deploy
+kubectl rollout status deployment nginx-deploy
+
+kubectl rollout resume deployment nginx-deploy
+kubectl get pods -l app=nginx -o wide
+
+kubectl delete -f aula05/deploy/nginx-deploy.yaml
+kubectl delete service nginx-deploy
+
+
+
+
+

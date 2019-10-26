@@ -1,0 +1,80 @@
+Slide 05
+
+sudo mkdir -p /etc/docker/certs.d/registry.dexter.com.br:5000 
+
+scp registry.dexter.com.br:certs/dexter.crt .
+
+sudo mv dexter.crt \
+/etc/docker/certs.d/registry.dexter.com.br:5000/ca.crt
+
+Slide 06
+
+docker login -u suporte registry.dexter.com.br:5000
+cat .docker/config.json
+
+docker pull busybox:1.28.4
+docker image ls | grep busybox
+
+docker tag busybox:1.28.4 registry.dexter.com.br:5000/busybox:latest
+docker push registry.dexter.com.br:5000/busybox:latest
+
+Slide 07
+
+cat aula07/images/busybox-deploy.yaml
+kubectl create -f aula07/images/busybox-deploy.yaml
+
+kubectl get pods -l app=busybox -o wide
+
+POD=$(kubectl get pods -l app=busybox | grep busybox \
+| awk -F" " '{print $1}' | tail -1)
+kubectl describe pod $POD
+
+
+Slide 09
+
+kubectl create secret docker-registry dexter-security \
+ --docker-server=registry.dexter.com.br:5000 \
+ --docker-username=suporte --docker-password=4linux
+
+
+vim aula07/images/busybox-deploy.yaml +$
+....
+        imagePullPolicy: Always
+      imagePullSecrets:
+        - name: dexter-security
+
+Descrição das opções
+
+Especificando ImagePullSecrets em um Pod, somente pods que fornecem chaves próprias podem acessar o registro privado.
+ 
+Slide 10
+
+kubectl apply -f aula07/images/busybox-deploy.yaml
+
+kubectl get pods -l app=busybox -o wide
+
+POD=$(kubectl get pod | grep busybox | awk -F" " '{print $1}' \
+| tail -1)
+kubectl describe pod $POD
+
+Slide 12
+
+kubectl delete -f aula07/images/busybox-deploy.yaml
+
+kubectl patch serviceaccount default -p \
+ '{"imagePullSecrets": [{"name": "dexter-security"}]}'
+
+kubectl get serviceaccounts default -o yaml
+
+Slide 13
+
+vim aula07/images/busybox-deploy.yaml
+....
+        imagePullPolicy: Always
+
+kubectl create -f aula07/images/busybox-deploy.yaml
+kubectl get pods -l app=busybox -o wide
+
+kubectl delete -f aula07/images/busybox-deploy.yaml
+
+

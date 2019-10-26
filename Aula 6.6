@@ -1,0 +1,65 @@
+Slide 06
+
+curl -L \
+https://github.com/kubernetes/kompose/releases/download/v1.18.0/kompose-linux-amd64 -o kompose
+
+chmod +x kompose
+sudo mv ./kompose /usr/local/bin/kompose
+
+kompose version
+
+Slide 08
+
+kompose --help
+kompose up --help
+kompose convert --help
+
+Slide 09
+
+cd aula06/compose/
+cat docker-compose.yml
+
+kompose up
+
+kubectl get pod,deployment,services \
+| egrep 'redis-master|redis-slave|frontend'
+
+
+kompose up: Executa o Deploy das aplicações, a partir do arquivo docker-compose.yml. Para selecionar o OpenShift como provedor do Cluster, execute: kompose up --provider=OpenShift.
+
+Slide 10
+
+kubectl get services -l io.kompose.service=frontend
+
+export APP=$(kubectl get endpoints \
+-l io.kompose.service=frontend | awk -F" " '{print $2}' | tail -1)
+
+curl http://$APP
+
+Slide 11
+
+kompose down
+
+kubectl get pod,deployment,services \
+| egrep 'redis-master|redis-slave|frontend'
+
+kompose convert
+ls *.yaml
+
+
+kompose down: Exclui serviços e deploy instanciados pelo CLuster Kubernetes;
+kompose convert: Converte um arquivo docker-compose.yml em arquivos de manifestos YAML do Kubernetes.
+
+
+Slide 12
+
+mkdir deploy-redis
+mv *.yaml deploy-redis
+
+kubectl apply -f deploy-redis
+kubectl get endpoints -l io.kompose.service=frontend
+
+kubectl delete -f deploy-redis
+cd
+
+
